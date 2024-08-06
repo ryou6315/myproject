@@ -1,0 +1,60 @@
+pipeline {
+    agent any
+
+    environment {
+        NEW_RELIC_API_KEY = '' 
+        NEW_RELIC_APP_ID = '' 
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                echo 'Deploying...'
+                // 添加你的部署步骤
+
+                // 发送更改通知到 New Relic
+                script {
+                    try {
+                        sendNewRelicChangeNotification()
+                    } catch (Exception e) {
+                        echo "Failed to send New Relic change notification: ${e.message}"
+                        error("Pipeline failed due to New Relic notification error.")
+                    }
+                }
+            }
+        }
+    }
+}
+
+def sendNewRelicChangeNotification() {
+    def newRelicUrl = "https://api.newrelic.com/v2/applications/${env.NEW_RELIC_APP_ID}/deployments.json"
+    
+    def requestBody = """
+    {
+      "deployment": {
+        "revision": "${env.BUILD_ID}",
+        "changelog": "ビルドのデプロイメント変更ログ ${env.BUILD_ID}",
+        "description": "ビルドの展開の説明 ${env.BUILD_ID}",
+        "user": "user011"
+        
+      }
+    }
+    """
+    
+    echo "Sending request to: ${newRelicUrl}"
+    echo "Request body: ${requestBody}"
+    
+    
+    def response = httpRequest(
+        httpMode: 'POST',
+        url: newRelicUrl,
+        customHeaders: [
+            [name: 'X-Api-Key', value: env.NEW_RELIC_API_KEY],
+            [name: 'Content-Type', value: 'application/json; charset=utf-8']
+        ],
+        requestBody: requestBody,
+        validResponseCodes: '200:299'
+    )
+    
+    echo "Response: ${response}"
+}
