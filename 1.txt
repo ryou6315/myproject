@@ -1,0 +1,27 @@
+const assert = require('assert');
+const http = require('http');  // 使用标准的 'http' 模块
+
+const url = 'http://example.com';
+
+http.get(url, (response) => {
+    // Log the status code
+    console.log('Status Code:', response.statusCode);
+
+    // Assert that the status code is 200
+    assert.strictEqual(response.statusCode, 200, 'Expected status code to be 200');
+
+    let data = '';
+
+    // Collect response data
+    response.on('data', (chunk) => {
+        data += chunk;
+    });
+
+    // Once the whole response has been received
+    response.on('end', () => {
+        console.log('Response Body:', data);
+    });
+
+}).on('error', (err) => {
+    console.log('Error:', err.message);
+});
