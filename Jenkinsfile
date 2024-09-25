@@ -45,20 +45,24 @@ pipeline {
             steps {
                 echo '部署阶段...'
                  script {
-                     //description
-                    def description = sh(script: "git rev-list -n 1 ${tagName}", returnStdout: true).trim()
-                    echo "1.description----: ${description}"
-                     
-                    //revisionを取得
+
+
+                     //revisionを取得
                     def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
-                    echo "2.revision----: ${revision}"
+                    echo "1.revision----: ${revision}"
+                     
+                     //description
+                    def description = sh(script: "git rev-list -n 1 ${revision}", returnStdout: true).trim()
+                    echo "2.description----: ${description}"
+                     
+                    
 
                     //userを取得
-                    def user = sh(script: "git show ${tagName} --format='%an' --no-patch", returnStdout: true).trim()
+                    def user = sh(script: "git show ${revision} --format='%an' --no-patch", returnStdout: true).trim()
                     echo "3.Tag----: ${user}"
 
                     // changelog
-                    def changelog = sh(script: "git log -n 1 --merges --format=%s ${tagName}", returnStdout: true).trim()
+                    def changelog = sh(script: "git log -n 1 --merges --format=%s ${revision}", returnStdout: true).trim()
                     echo "4.changelog----:: ${changelog}"
                     
                 }
