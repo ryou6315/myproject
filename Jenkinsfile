@@ -58,7 +58,7 @@ pipeline {
                     echo "Tag 作者: ${tagInfo}"
 
                     //version
-                   def version = sh(script: "git rev-list -n 1 ${tagName} | cut -c 1-6", returnStdout: true).trim()
+                   def version = sh(script: "git rev-list -n 1 ${tagName}", returnStdout: true).trim()
                    echo "Version: ${version}"
               
                 }
