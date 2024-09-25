@@ -7,8 +7,10 @@ pipeline {
                 checkout([$class: 'GitSCM', 
                           branches: [[name: '*/master']], 
                           userRemoteConfigs: [[url: 'https://github.com/ryou6315/myproject.git',credentialsId: 'ryou6315']],
-                          extensions: [[$class: 'WipeOutWorkspace']]]
-                        )
+                          extensions: [
+                              [$class: 'WipeOutWorkspace']
+                         ]
+                        ])
                 
             
 
