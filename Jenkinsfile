@@ -21,7 +21,7 @@ pipeline {
 
 def sendNewRelicChangeNotification(revision) {
     def newRelicUrl = "https://api.newrelic.com/v2/applications/${env.NEW_RELIC_APP_ID}/deployments.json"
-     
+    echo "#####${revision}"
     //description
     def description = sh(script: "git rev-list -n 1 ${revision}", returnStdout: true).trim()
 
