@@ -13,7 +13,9 @@ pipeline {
                      try {
                         def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
                         if (revision != null && revision.trim() != '') {
+                            if (env.GIT_BRANCH == "master") {
                             sendNewRelicChangeNotification(revision)
+                            }
                         }
                     } catch (Exception e) {
                         echo "New Relicの本番リリースディプロイの通知送信に失敗しました: ${e.message}"
