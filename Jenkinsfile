@@ -1,7 +1,6 @@
 pipeline {
     agent any
     stages {
-
         stage('Clean Workspace') {
             steps {
                 cleanWs() // 清理工作区
@@ -12,12 +11,8 @@ pipeline {
                 echo '初始化阶段...'
                 checkout([$class: 'GitSCM', 
                           branches: [[name: '*/master']], 
-                          userRemoteConfigs: [[url: 'https://github.com/ryou6315/myproject.git',credentialsId: 'ryou6315']],
-                          
+                          userRemoteConfigs: [[url: 'https://github.com/ryou6315/myproject.git',credentialsId: 'ryou6315']], 
                         ])
-                
-            
-
 
             }
         }
