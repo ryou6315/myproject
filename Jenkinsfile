@@ -4,6 +4,7 @@ pipeline {
         stage('Clean Workspace') {
             steps {
                 //cleanWs() // 清理工作区
+                echo '清理工作区...'
             }
         }
         stage('初始化') {
