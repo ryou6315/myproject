@@ -1,14 +1,14 @@
 pipeline {
     agent any
+    environment {
+            NEW_RELIC_API_KEY = 'NRAK-VSF0X62BE2VQJJE1VN2SY9WFN2T' 
+            NEW_RELIC_APP_ID = '1326011399'
+            JAVA_OPTS = '-Dfile.encoding=UTF-8'
+    }
     stages {
         stage('Deploy') {
             steps {
                 echo 'Deploy......'
-                environment {
-                        NEW_RELIC_API_KEY = 'NRAK-VSF0X62BE2VQJJE1VN2SY9WFN2T' 
-                        NEW_RELIC_APP_ID = '1326011399'
-                        JAVA_OPTS = '-Dfile.encoding=UTF-8'
-                }
                  script { 
                     def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
                     echo "1.revision----: ${revision}"
