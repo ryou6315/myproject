@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('Clean Workspace') {
             steps {
-                cleanWs() // 清理工作区
+                //cleanWs() // 清理工作区
             }
         }
         stage('初始化') {
@@ -12,6 +12,7 @@ pipeline {
                 checkout([$class: 'GitSCM', 
                           branches: [[name: '*/master']], 
                           userRemoteConfigs: [[url: 'https://github.com/ryou6315/myproject.git',credentialsId: 'ryou6315']], 
+                          extensions: [[$class: 'WipeOutWorkspace']]
                         ])
 
             }
