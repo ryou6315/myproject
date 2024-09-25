@@ -3,6 +3,8 @@ const http = require('http');  // 使用标准的 'http' 模块
 
 const url = 'http://example.com';
 dddsafsafsad
+safsa
+safsad
 http.get(url, (response) => {
     // Log the status code
     console.log('Status Code:', response.statusCode);
