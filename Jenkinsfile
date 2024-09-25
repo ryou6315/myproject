@@ -10,9 +10,16 @@ pipeline {
             steps {
                 echo 'Deploy......'
                  script { 
-                    def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
-                    echo "1.revision----: ${revision}"
-                    sendNewRelicChangeNotification(revision) 
+                     try {
+                        def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
+                        if (revision != null && revision.trim() != '') {
+                            sendNewRelicChangeNotification(revision)
+                        }
+                    } catch (Exception e) {
+                        echo "New Relicの本番リリースディプロイの通知送信に失敗しました: ${e.message}"
+                       
+                    }
+                    
                 }
             }
         }
