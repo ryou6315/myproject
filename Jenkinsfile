@@ -46,7 +46,7 @@ pipeline {
                 echo '部署阶段...'
                  script {
                     // 获取最近一次提交的标签名
-                    def tagName = sh(script: "git log -1 --decorate --oneline | grep -oP '(?<=tag: )[^,)]*'", returnStdout: true).trim()
+                    def tagName = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
                     echo "取得的标签名: ${tagName}"
 
                     // 获取 mytest1 标签的最后一次合并提交信息
