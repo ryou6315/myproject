@@ -45,6 +45,7 @@ pipeline {
             steps {
                 echo '部署阶段...'
                  script {
+                     sh 'rm -rf /var/lib/jenkins/workspace/git-pipline/*'
                     // 获取最近一次提交的标签名
                     def tagName = sh(script: "git tag --merged master --sort=-creatordate | head -n 1", returnStdout: true).trim()
                     echo "取得的标签名: ${tagName}"
