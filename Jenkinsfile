@@ -12,11 +12,11 @@ pipeline {
                  script { 
                      try {
                    
-                        if (revision != null && revision.trim() != '') {
+                        //if (revision != null && revision.trim() != '') {
                             //if (env.GIT_BRANCH == "master") {
                             sendNewRelicChangeNotification()
                             //}
-                        }
+                       // }
                     } catch (Exception e) {
                         echo "New Relicの本番リリースディプロイの通知送信に失敗しました: ${e.message}"
                        
