@@ -33,12 +33,15 @@ def sendNewRelicChangeNotification(revision) {
  
     //descriptionを取得
     def description = sh(script: "git rev-list -n 1 ${revision} | cut -c 1-6", returnStdout: true).trim()
+    echo "1.description:${description}"
 
     //userを取得
     def user = sh(script: "git show ${revision} --format='%an' --no-patch", returnStdout: true).trim()
+    echo "2.user:${user}"
 
     // changelogを取得
     def changelog = sh(script: "git log -n 1 --merges --format=%s ${revision}", returnStdout: true).trim()
+    echo "3.changelog:${changelog}"
     
     def requestBody = """
     {
