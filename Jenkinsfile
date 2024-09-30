@@ -14,7 +14,7 @@ pipeline {
                         def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
                         if (revision != null && revision.trim() != '') {
                             //if (env.GIT_BRANCH == "master") {
-                            sendNewRelicChangeNotification(revision)
+                            sendNewRelicChangeNotification()
                             //}
                         }
                     } catch (Exception e) {
@@ -28,13 +28,13 @@ pipeline {
     }
 }
 
-def sendNewRelicChangeNotification(revision) {
+def sendNewRelicChangeNotification() {
     def newRelicUrl = "https://api.newrelic.com/v2/applications/${env.NEW_RELIC_APP_ID}/deployments.json"
  
     //descriptionを取得
     def description = sh(script: "git rev-list -n 1 ${revision} | cut -c 1-6", returnStdout: true).trim()
-    def revision1 = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
-    echo "0.revision:${revision1}"
+    def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
+    echo "0.revision:${revision}"
     echo "1.description:${description}"
 
     //userを取得
