@@ -29,7 +29,6 @@ pipeline {
     }
 }
 
-//def sendNewRelicChangeNotification(revision) {
 def sendNewRelicChangeNotification() {
     def newRelicUrl = "https://api.newrelic.com/v2/applications/${env.NEW_RELIC_APP_ID}/deployments.json"
  
