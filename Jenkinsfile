@@ -1,69 +1,69 @@
 pipeline {
     agent any
+    environment {
+            NEW_RELIC_API_KEY = 'NRAK-VSF0X62BE2VQJJE1VN2SY9WFN2T' 
+            NEW_RELIC_APP_ID = '1326011399'
+            JAVA_OPTS = '-Dfile.encoding=UTF-8'
+    }
     stages {
-        stage('Clean Workspace') {
+        stage('Deploy') {
             steps {
-                //cleanWs() // 清理工作区
-                echo '清理工作区...'
-            }
-        }
-        stage('初始化') {
-            steps {
-                echo '初始化阶段...'
-                
-
-            }
-        }
-        stage('构建') {
-            steps {
-                echo '构建阶段...'
-                script{
-                     sh 'git checkout master'
-                     def branch = sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-                        echo "当前分支: ${branch}" 
-                }
-                
-                sh 'git status' 
-                sh 'git log -5 --oneline' 
-                
-                
-                
-            }
-        }
-        stage('测试') {
-            steps {
-
-                sh 'pwd'
-                sh 'ls -l'  // 列出当前目录中的文件
-               
-                echo '测试阶段...'
-                sh 'git for-each-ref --format "\'%(taggername)\'" refs/tags/mytest1'
- 
-            }
-        }
-        stage('部署') {
-            steps {
-                echo '部署阶段...'
-                 script {
-                    // 获取最近一次提交的标签名
-                    def tagName = sh(script: "git log -1 --decorate --oneline | grep -oP '(?<=tag: )[^,)]*'", returnStdout: true).trim()
-                    echo "取得的标签名: ${tagName}"
-
-                    // 获取 mytest1 标签的最后一次合并提交信息
-                    def commitMessage = sh(script: "git log -n 1 --merges --format=%s ${tagName}", returnStdout: true).trim()
-                    echo "最后一次合并提交的信息: ${commitMessage}"
+                echo 'Deploy......'
+                 script { 
+                     try {
+                   
+                        //if (revision != null && revision.trim() != '') {
+                            //if (env.GIT_BRANCH == "master") {
+                            sendNewRelicChangeNotification()
+                            //}
+                       // }
+                    } catch (Exception e) {
+                        echo "New Relicの本番リリースディプロイの通知送信に失敗しました: ${e.message}"
+                       
+                    }
                     
-                     //作者
-                    def tagInfo = sh(script: "git show ${tagName} --format='%an' --no-patch", returnStdout: true).trim()
-                    echo "Tag 作者: ${tagInfo}"
-
-                    //version
-                   def version = sh(script: "git log -1 --decorate --oneline | awk '{print \$1}' | cut -c 1-6", returnStdout: true).trim()
-                   echo "Version: ${version}"
-              
                 }
-        
             }
         }
     }
+}
+
+def sendNewRelicChangeNotification() {
+    def newRelicUrl = "https://api.newrelic.com/v2/applications/${env.NEW_RELIC_APP_ID}/deployments.json"
+ 
+    //descriptionを取得
+    def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
+    echo "0.revision:${revision}"
+    
+    def description = sh(script: "git rev-list -n 1 ${revision} | cut -c 1-6", returnStdout: true).trim()
+    echo "1.description:${description}"
+
+    //userを取得
+    def user = sh(script: "git show ${revision} --format='%an' --no-patch", returnStdout: true).trim()
+    echo "2.user:${user}"
+
+    // changelogを取得
+    def changelog = sh(script: "git log -n 1 --merges --format=%s ${revision}", returnStdout: true).trim()
+    echo "3.changelog:${changelog}"
+    
+    def requestBody = """
+    {
+      "deployment": {
+        "revision": "${revision}",
+        "changelog": "${changelog}",
+        "description": "${description}",
+        "user": "${user}"
+      }
+    }
+    """
+    def response = httpRequest(
+        httpMode: 'POST',
+        url: newRelicUrl,
+        customHeaders: [
+            [name: 'X-Api-Key', value: env.NEW_RELIC_API_KEY],
+            [name: 'Content-Type', value: 'application/json; charset=utf-8']
+        ],
+        requestBody: requestBody,
+        validResponseCodes: '200:299'
+    )
 }
