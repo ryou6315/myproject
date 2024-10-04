@@ -1,35 +1,3 @@
-pipeline {
-    agent any
-    environment {
-            NEW_RELIC_API_KEY = 'NRAK-VSF0X62BE2VQJJE1VN2SY9WFN2T' 
-            NEW_RELIC_APP_ID = '1326011399'
-            JAVA_OPTS = '-Dfile.encoding=UTF-8'
-    }
-    stages {
-        stage('Deploy') {
-            steps {
-                echo 'Deploy......'
-                 script { 
-                     try {
-                   
-                        //if (revision != null && revision.trim() != '') {
-                            //if (env.GIT_BRANCH == "master") {
-                            sh(script: "git tag --sort=-creatordate ")
-                            //echo "10.revision:${revision}"
-                            //sendNewRelicChangeNotification()
-                            //}
-                       // }
-                    } catch (Exception e) {
-                        echo "New Relicの本番リリースディプロイの通知送信に失敗しました: ${e.message}"
-                       
-                    }
-                    
-                }
-            }
-        }
-    }
-}
-
 def sendNewRelicChangeNotification() {
     def newRelicUrl = "https://api.newrelic.com/v2/applications/${env.NEW_RELIC_APP_ID}/deployments.json"
  
@@ -69,3 +37,38 @@ def sendNewRelicChangeNotification() {
         validResponseCodes: '200:299'
     )
 }
+pipeline {
+    agent any
+    environment {
+            NEW_RELIC_API_KEY = 'NRAK-VSF0X62BE2VQJJE1VN2SY9WFN2T' 
+            NEW_RELIC_APP_ID = '1326011399'
+            JAVA_OPTS = '-Dfile.encoding=UTF-8'
+    }
+    stages {
+        stage('Deploy') {
+            steps {
+                echo 'Deploy......'
+                 script { 
+                     try {
+                   
+                        //if (revision != null && revision.trim() != '') {
+                            //if (env.GIT_BRANCH == "master") {
+                            sh(script: "git log -n 1 ")
+                            sh(script: "git tag --sort=-creatordate ")
+                            
+                            //echo "10.revision:${revision}"
+                            //sendNewRelicChangeNotification()
+                            //}
+                       // }
+                    } catch (Exception e) {
+                        echo "New Relicの本番リリースディプロイの通知送信に失敗しました: ${e.message}"
+                       
+                    }
+                    
+                }
+            }
+        }
+    }
+}
+
+
