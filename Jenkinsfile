@@ -14,9 +14,9 @@ pipeline {
                    
                         //if (revision != null && revision.trim() != '') {
                             //if (env.GIT_BRANCH == "master") {
-                            def revision = sh(script: "git tag --sort=-creatordate | head -n 1", returnStdout: true).trim()
-                            echo "10.revision:${revision}"
-                            sendNewRelicChangeNotification()
+                            sh(script: "git tag --sort=-creatordate ")
+                            //echo "10.revision:${revision}"
+                            //sendNewRelicChangeNotification()
                             //}
                        // }
                     } catch (Exception e) {
