@@ -14,6 +14,7 @@ pipeline {
                    
                         //if (revision != null && revision.trim() != '') {
                             //if (env.GIT_BRANCH == "master") {
+                            sh(script: "cd /var/lib/jenkins/workspace/my-multi-pipeline_master", returnStdout: true).trim()
                             sendNewRelicChangeNotification()
                             //}
                        // }
