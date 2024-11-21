@@ -14,3 +14,24 @@ $$
 
   return output; // 返回结果
 $$;
+
+
+CREATE OR REPLACE TABLE outest_table (
+  id INT,
+  name STRING
+);
+
+INSERT INTO outest_table (id, name)
+VALUES 
+  (1, 'Alice'),
+  (2, 'Bob'),
+  (3, 'Charlie');
+
+
+CREATE OR REPLACE PROCEDURE return_table()
+  RETURNS TABLE (id INT, name STRING)
+  LANGUAGE JAVASCRIPT
+AS
+$$
+  return snowflake.execute("SELECT id, name FROM my_table");
+$$;
