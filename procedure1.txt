@@ -35,3 +35,20 @@ AS
 $$
   return snowflake.execute("SELECT id, name FROM my_table");
 $$;
+
+
+CREATE OR REPLACE PROCEDURE outest_table()
+  RETURNS STRING
+  LANGUAGE JAVASCRIPT
+AS
+$$
+  var sql = "SELECT id, name FROM outest_table";
+  var result = snowflake.execute(sql); 
+  var output = '';
+
+  while (result.next()) {
+    output += result.getColumnValue(1) + ', ' + result.getColumnValue(2) + '\n';  
+  }
+
+  return output; 
+$$;
