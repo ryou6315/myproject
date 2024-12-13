@@ -1,5 +1,5 @@
 import os
-import json
+import re
 
 # 指定目录路径
 directory = "指定目录路径"
@@ -20,23 +20,23 @@ else:
 
                 # 确保文件至少有两行
                 if len(lines) >= 2:
-                    # 解析第二行 JSON 内容
-                    second_line = json.loads(lines[1])
-                    
-                    # 如果存在 "name" 键，则获取其值
-                    if "name" in second_line:
-                        new_name = second_line["name"] + ".json"
+                    second_line = lines[1].strip()  # 去掉多余空格或换行符
+
+                    # 使用正则表达式提取 name 的值
+                    match = re.search(r'name="(.*?)"', second_line)
+                    if match:
+                        new_name = match.group(1) + ".json"  # 提取括号内的内容
                         new_file_path = os.path.join(directory, new_name)
 
-                        # 检查新文件名是否已经存在，避免覆盖
+                        # 检查新文件名是否已存在，避免覆盖
                         if not os.path.exists(new_file_path):
                             os.rename(file_path, new_file_path)
                             print(f"文件已重命名：{file_name} -> {new_name}")
                         else:
                             print(f"新文件名已存在，跳过：{new_name}")
                     else:
-                        print(f"文件 {file_name} 的第二行未包含 'name' 键，跳过。")
+                        print(f"文件 {file_name} 的第二行未包含有效的 name 格式，跳过：{second_line}")
                 else:
                     print(f"文件 {file_name} 的内容不足两行，跳过。")
-            except json.JSONDecodeError:
-                print(f"文件 {file_name} 的第二行不是有效的 JSON，跳过。")
+            except Exception as e:
+                print(f"处理文件 {file_name} 时发生错误：{e}")
