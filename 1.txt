@@ -1,1 +1,42 @@
-11
+import os
+import json
+
+# 指定目录路径
+directory = "指定目录路径"
+
+# 检查目录是否存在
+if not os.path.exists(directory):
+    print(f"目录不存在：{directory}")
+else:
+    # 遍历目录中的所有文件
+    for file_name in os.listdir(directory):
+        file_path = os.path.join(directory, file_name)
+
+        # 确保是文件且大小大于 0
+        if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+
+                # 确保文件至少有两行
+                if len(lines) >= 2:
+                    # 解析第二行 JSON 内容
+                    second_line = json.loads(lines[1])
+                    
+                    # 如果存在 "name" 键，则获取其值
+                    if "name" in second_line:
+                        new_name = second_line["name"] + ".json"
+                        new_file_path = os.path.join(directory, new_name)
+
+                        # 检查新文件名是否已经存在，避免覆盖
+                        if not os.path.exists(new_file_path):
+                            os.rename(file_path, new_file_path)
+                            print(f"文件已重命名：{file_name} -> {new_name}")
+                        else:
+                            print(f"新文件名已存在，跳过：{new_name}")
+                    else:
+                        print(f"文件 {file_name} 的第二行未包含 'name' 键，跳过。")
+                else:
+                    print(f"文件 {file_name} 的内容不足两行，跳过。")
+            except json.JSONDecodeError:
+                print(f"文件 {file
