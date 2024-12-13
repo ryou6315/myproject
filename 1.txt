@@ -1,42 +1,48 @@
 import os
 import re
+import pandas as pd
 
 # 指定目录路径
 directory = "指定目录路径"
 
-# 检查目录是否存在
-if not os.path.exists(directory):
-    print(f"目录不存在：{directory}")
-else:
-    # 遍历目录中的所有文件
-    for file_name in os.listdir(directory):
+# 初始化集合用于存储结果
+result_set = set()
+
+# 遍历目录中的所有 Excel 文件
+for file_name in os.listdir(directory):
+    if file_name.endswith(".xlsx"):
         file_path = os.path.join(directory, file_name)
+        print(f"处理文件: {file_name}")
 
-        # 确保是文件且大小大于 0
-        if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    lines = f.readlines()
+        # 打开 Excel 文件
+        try:
+            excel_file = pd.ExcelFile(file_path)
 
-                # 确保文件至少有两行
-                if len(lines) >= 2:
-                    second_line = lines[1].strip()  # 去掉多余空格或换行符
+            # 遍历所有 Sheet
+            for sheet_name in excel_file.sheet_names:
+                sheet_data = excel_file.parse(sheet_name)
 
-                    # 使用正则表达式提取 name 的值
-                    match = re.search(r'name="(.*?)"', second_line)
-                    if match:
-                        new_name = match.group(1) + ".json"  # 提取括号内的内容
-                        new_file_path = os.path.join(directory, new_name)
+                # 检查 [处理sheet]
+                if sheet_name == "[处理sheet]":
+                    # 遍历每个单元格，查找包含 "JOB001" 的内容
+                    for row in sheet_data.values:
+                        for cell in row:
+                            if isinstance(cell, str) and "JOB001" in cell:
+                                result_set.add(cell)  # 将结果添加到集合
 
-                        # 检查新文件名是否已存在，避免覆盖
-                        if not os.path.exists(new_file_path):
-                            os.rename(file_path, new_file_path)
-                            print(f"文件已重命名：{file_name} -> {new_name}")
-                        else:
-                            print(f"新文件名已存在，跳过：{new_name}")
-                    else:
-                        print(f"文件 {file_name} 的第二行未包含有效的 name 格式，跳过：{second_line}")
+                # 检查其他 Sheet 中的 "SF注释"
                 else:
-                    print(f"文件 {file_name} 的内容不足两行，跳过。")
-            except Exception as e:
-                print(f"处理文件 {file_name} 时发生错误：{e}")
+                    # 遍历每个单元格，查找类似 `call "SF注释"('abc');` 的内容
+                    for row in sheet_data.values:
+                        for cell in row:
+                            if isinstance(cell, str):
+                                match = re.search(r'call "SF注释"\(\'(.*?)\'\);', cell)
+                                if match:
+                                    result_set.add(match.group(1))  # 提取括号内的内容并添加到集合
+        
+        except Exception as e:
+            print(f"处理文件 {file_name} 时发生错误: {e}")
+
+# 输出结果
+print("\n处理结果:")
+print(result_set)
