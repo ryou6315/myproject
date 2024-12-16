@@ -1,38 +1,32 @@
 import os
-import shutil
+import re
 
-# ファイルパスを定義
-source_file = "copy.json"  # コピー元のファイル
-txt_file = "file_list.txt"  # ファイル名リストが書かれたtxtファイル
-output_dir = "output_files"  # コピー後の出力フォルダ
+# 処理対象のディレクトリを指定
+input_dir = "target_directory"  # 処理するディレクトリのパス
 
-# 出力用ディレクトリが存在しない場合は作成
-os.makedirs(output_dir, exist_ok=True)
+# 置換用の正規表現パターン
+pattern1 = re.compile(r"^   ")  # 行頭のスペース3つ
+pattern2 = re.compile(r"\r\n")  # \r\n を探すパターン
+pattern3 = re.compile(r"aa")  # "aa" を探すパターン
 
-# コピー元ファイルが存在するかどうかを確認
-if not os.path.exists(source_file):
-    print(f"源ファイル {source_file} が存在しません。パスを確認してください！")
-    exit(1)
+# ディレクトリ内のすべてのファイルを処理
+for root, _, files in os.walk(input_dir):
+    for file in files:
+        file_path = os.path.join(root, file)
 
-# ファイル名リストが存在するかを確認
-if not os.path.exists(txt_file):
-    print(f"ファイル名リスト {txt_file} が存在しません。パスを確認してください！")
-    exit(1)
+        # ファイルを読み込む
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
 
-# ファイル名リストを読み込み
-with open(txt_file, "r", encoding="utf-8") as f:
-    file_names = [line.strip() for line in f if line.strip()]
+        # 正規表現に基づいて内容を置換
+        content = pattern1.sub("", content)  # "^   " を "" に置換
+        content = pattern2.sub("\n", content)  # "\r\n" を "\n" に置換
+        content = pattern3.sub("bb", content)  # "aa" を "bb" に置換
 
-# ファイル名を過るって、コピーしてリネーム
-for name in file_names:
-    # 出力用のファイル名を定義
-    main_file = os.path.join(output_dir, f"{name}_main.json")
-    sub_file = os.path.join(output_dir, f"{name}_sub.json")
+        # 修正後の内容を元のファイルに書き戻す
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(content)
 
-    # 源ファイルをコピーし、名前を変更
-    shutil.copy(source_file, main_file)
-    shutil.copy(source_file, sub_file)
+        print(f"置換完了: {file_path}")
 
-    print(f"ファイル作成済み：{main_file} と {sub_file}")
-
-print("すべてのファイルの処理が完了しました！")
+print("すべてのファイルの置換が完了しました！")
