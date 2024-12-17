@@ -1,32 +1,49 @@
-import os
-import re
+import pandas as pd
+import time
+from datetime import datetime
+import winsound  # 用于播放提示音（仅适用于 Windows 系统）
 
-# 処理対象のディレクトリを指定
-input_dir = "target_directory"  # 処理するディレクトリのパス
+# 步骤 1: 读取 Excel 文件中的闹钟时间
+def read_alarm_times(file_path, sheet_name="Sheet1"):
+    df = pd.read_excel(file_path, sheet_name=sheet_name)
+    # 将时间转化为字符串再转为 datetime 对象
+    return [datetime.strptime(str(t), "%H:%M:%S").time() for t in df['时间']]  # 修改为你的列名
 
-# 置換用の正規表現パターン
-pattern1 = re.compile(r"^   ")  # 行頭のスペース3つ
-pattern2 = re.compile(r"\r\n")  # \r\n を探すパターン
-pattern3 = re.compile(r"aa")  # "aa" を探すパターン
+# 步骤 2: 检查是否为周一到周五
+def is_weekday():
+    # weekday() 返回 0-6 对应周一到周日
+    today = datetime.now().weekday()
+    return today < 5  # 返回 True 表示是周一到周五
 
-# ディレクトリ内のすべてのファイルを処理
-for root, _, files in os.walk(input_dir):
-    for file in files:
-        file_path = os.path.join(root, file)
+# 步骤 3: 定时检查闹钟时间并触发
+def check_alarms(alarm_times):
+    while True:
+        now = datetime.now()
+        current_time = now.time()  # 当前时间（只保留时分秒）
+        
+        # 判断是否为工作日（周一到周五）
+        if is_weekday():
+            if current_time in alarm_times:  # 如果当前时间匹配闹钟时间
+                print(f"闹钟响了！时间是 {current_time}")
+                play_sound()  # 播放闹钟声音
+                alarm_times.remove(current_time)  # 防止重复触发
+        else:
+            print(f"今天是周末，不触发闹钟。当前时间：{current_time}")
 
-        # ファイルを読み込む
-        with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()
+        time.sleep(1)  # 每秒检查一次
 
-        # 正規表現に基づいて内容を置換
-        content = pattern1.sub("", content)  # "^   " を "" に置換
-        content = pattern2.sub("\n", content)  # "\r\n" を "\n" に置換
-        content = pattern3.sub("bb", content)  # "aa" を "bb" に置換
+# 步骤 4: 播放闹钟声音
+def play_sound():
+    frequency = 2500  # 声音频率（Hz）
+    duration = 1000  # 声音持续时间（ms）
+    winsound.Beep(frequency, duration)
 
-        # 修正後の内容を元のファイルに書き戻す
-        with open(file_path, "w", encoding="utf-8") as f:
-            f.write(content)
+# 主程序
+if __name__ == "__main__":
+    # 读取 Excel 中的时间
+    file_path = "alarms.xlsx"  # 替换为你的文件路径
+    alarm_times = read_alarm_times(file_path)
+    print(f"读取到的闹钟时间: {alarm_times}")
 
-        print(f"置換完了: {file_path}")
-
-print("すべてのファイルの置換が完了しました！")
+    # 检查闹钟时间
+    check_alarms(alarm_times)
