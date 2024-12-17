@@ -3,36 +3,50 @@ import time
 from datetime import datetime
 import winsound  # 用于播放提示音（仅适用于 Windows 系统）
 
-# 步骤 1: 读取 Excel 文件中的闹钟时间
+# 1. 读取 Excel 文件中的闹钟信息
 def read_alarm_times(file_path, sheet_name="Sheet1"):
     df = pd.read_excel(file_path, sheet_name=sheet_name)
-    # 将时间转化为字符串再转为 datetime 对象
-    return [datetime.strptime(str(t), "%H:%M:%S").time() for t in df['时间']]  # 修改为你的列名
+    # 筛选“是否启用”为“是”的记录
+    enabled_alarms = df[df['是否启用'] == '是']
+    alarm_data = []
+    for _, row in enabled_alarms.iterrows():
+        # 将时间字段转化为时间类型
+        alarm_time = datetime.strptime(str(row['时间']), "%H:%M:%S").time()
+        # 读取适用日期
+        applicable_days = row['适用日期'].split(", ")  # 根据逗号分隔
+        alarm_data.append((alarm_time, applicable_days))
+    return alarm_data
 
-# 步骤 2: 检查是否为周一到周五
-def is_weekday():
-    # weekday() 返回 0-6 对应周一到周日
-    today = datetime.now().weekday()
-    return today < 5  # 返回 True 表示是周一到周五
+# 2. 判断今天是否在适用日期范围内
+def is_alarm_day(applicable_days):
+    # 获取今天是周几（0=周一，1=周二，...，6=周日）
+    weekday_map = {
+        0: "周一",
+        1: "周二",
+        2: "周三",
+        3: "周四",
+        4: "周五",
+        5: "周六",
+        6: "周日",
+    }
+    today = datetime.now().weekday()  # 返回今天是第几天（0-6）
+    today_str = weekday_map[today]
+    return today_str in applicable_days
 
-# 步骤 3: 定时检查闹钟时间并触发
-def check_alarms(alarm_times):
+# 3. 定时检查闹钟并触发
+def check_alarms(alarm_data):
     while True:
         now = datetime.now()
-        current_time = now.time()  # 当前时间（只保留时分秒）
-        
-        # 判断是否为工作日（周一到周五）
-        if is_weekday():
-            if current_time in alarm_times:  # 如果当前时间匹配闹钟时间
-                print(f"闹钟响了！时间是 {current_time}")
-                play_sound()  # 播放闹钟声音
-                alarm_times.remove(current_time)  # 防止重复触发
-        else:
-            print(f"今天是周末，不触发闹钟。当前时间：{current_time}")
+        current_time = now.time()  # 当前时间（时分秒）
 
+        for alarm_time, applicable_days in alarm_data:
+            if current_time == alarm_time and is_alarm_day(applicable_days):
+                print(f"闹钟响了！时间是 {current_time}，适用日期为：{', '.join(applicable_days)}")
+                play_sound()  # 播放声音
+                alarm_data.remove((alarm_time, applicable_days))  # 防止重复触发
         time.sleep(1)  # 每秒检查一次
 
-# 步骤 4: 播放闹钟声音
+# 4. 播放闹钟声音
 def play_sound():
     frequency = 2500  # 声音频率（Hz）
     duration = 1000  # 声音持续时间（ms）
@@ -40,10 +54,10 @@ def play_sound():
 
 # 主程序
 if __name__ == "__main__":
-    # 读取 Excel 中的时间
-    file_path = "alarms.xlsx"  # 替换为你的文件路径
-    alarm_times = read_alarm_times(file_path)
-    print(f"读取到的闹钟时间: {alarm_times}")
+    # 读取 Excel 数据
+    file_path = "alarms.xlsx"  # 替换为你的 Excel 文件路径
+    alarm_data = read_alarm_times(file_path)
+    print(f"读取到的闹钟数据: {alarm_data}")
 
-    # 检查闹钟时间
-    check_alarms(alarm_times)
+    # 开始检查闹钟
+    check_alarms(alarm_data)
