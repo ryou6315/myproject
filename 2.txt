@@ -1,5 +1,11 @@
 import pandas as pd
 
+# 调整 pandas 的显示设置
+pd.set_option('display.max_rows', None)  # 显示所有行
+pd.set_option('display.max_columns', None)  # 显示所有列
+pd.set_option('display.width', None)  # 自动调整宽度
+pd.set_option('display.max_colwidth', None)  # 显示完整的列内容
+
 # 假设 JSON 数据存储在 data.json 文件中
 with open('data.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
@@ -7,5 +13,6 @@ with open('data.json', 'r', encoding='utf-8') as file:
 # 使用 pandas 的 json_normalize 扁平化嵌套数据
 df = pd.json_normalize(data, record_path=['resources'])
 
-# 提取并输出 name 字段
+# 输出 name 字段
 print(df['name'])
+
