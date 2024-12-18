@@ -1,1 +1,11 @@
-11
+import pandas as pd
+
+# 假设 JSON 数据存储在 data.json 文件中
+with open('data.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+# 使用 pandas 的 json_normalize 扁平化嵌套数据
+df = pd.json_normalize(data, record_path=['resources'])
+
+# 提取并输出 name 字段
+print(df['name'])
