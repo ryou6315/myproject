@@ -1,16 +1,20 @@
 import requests
 
-def check_proxy_used(target_url):
-    try:
-        response = requests.get(target_url, timeout=5)
-        print("响应头：")
-        for key, value in response.headers.items():
-            print(f"{key}: {value}")
-        if 'Via' in response.headers or 'X-Forwarded-For' in response.headers:
-            print("✅ 检测到使用了代理")
-        else:
-            print("🚫 未检测到明显的代理")
-    except Exception as e:
-        print("请求失败：", e)
+def send_to_teams(webhook_url, message):
+    headers = {
+        "Content-Type": "application/json"
+    }
+    data = {
+        "text": message
+    }
 
-check_proxy_used("https://teams.microsoft.com")
+    try:
+        response = requests.post(webhook_url, json=data, headers=headers, timeout=5)
+        response.raise_for_status()
+        print("✅ 消息发送成功")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ 发送失败: {e}")
+
+# 示例调用
+webhook = "https://outlook.office.com/webhook/xxxxxxxxxxx"
+send_to_teams(webhook, "你好，这是从 Python 发送的消息 ✅")
