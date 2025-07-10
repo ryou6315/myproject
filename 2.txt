@@ -1,12 +1,16 @@
-from scapy.all import IP, ICMP, sr1
+import requests
 
-def get_first_hops(dest, hops=3):
-    for ttl in range(1, hops+1):
-        pkt = IP(dst=dest, ttl=ttl) / ICMP()
-        reply = sr1(pkt, timeout=2, verbose=0)
-        if reply:
-            print(f"Hop {ttl}: {reply.src}")
+def check_proxy_used(target_url):
+    try:
+        response = requests.get(target_url, timeout=5)
+        print("响应头：")
+        for key, value in response.headers.items():
+            print(f"{key}: {value}")
+        if 'Via' in response.headers or 'X-Forwarded-For' in response.headers:
+            print("✅ 检测到使用了代理")
         else:
-            print(f"Hop {ttl}: *")
+            print("🚫 未检测到明显的代理")
+    except Exception as e:
+        print("请求失败：", e)
 
-get_first_hops("8.8.8.8")
+check_proxy_used("https://teams.microsoft.com")
