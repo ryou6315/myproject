@@ -1,31 +1,23 @@
-import pandas as pd
+from scapy.all import IP, TCP, sr1
+import time
 
-# 调整 pandas 的显示设置
-pd.set_option('display.max_rows', None)  # 显示所有行
-pd.set_option('display.max_columns', None)  # 显示所有列
-pd.set_option('display.width', None)  # 自动调整宽度
-pd.set_option('display.max_colwidth', None)  # 显示完整的列内容
-# 指定要查找的目录
-directory = '/path/to/your/directory'
+def tcp_traceroute(dest, port=443, max_hops=30):
+    print(f"TCP Traceroute to {dest}:{port}")
+    for ttl in range(1, max_hops + 1):
+        pkt = IP(dst=dest, ttl=ttl) / TCP(dport=port, flags="S")
+        start = time.time()
+        reply = sr1(pkt, timeout=2, verbose=0)
+        rtt = (time.time() - start) * 1000
+        if reply is None:
+            print(f"{ttl}\t*")
+        elif reply.haslayer("TCP"):
+            print(f"{ttl}\t{reply.src}\t{round(rtt,2)} ms\tTCP响应")
+            if reply.getlayer("TCP").flags == 0x12:  # SYN-ACK
+                print("🎯 到达目标")
+                break
+        elif reply.haslayer("ICMP"):
+            print(f"{ttl}\t{reply.src}\t{round(rtt,2)} ms\tICMP响应")
+        else:
+            print(f"{ttl}\t未知响应")
 
-# 遍历目录，找到所有 JSON 文件
-for filename in os.listdir(directory):
-    if filename.endswith('.json'):
-        file_path = os.path.join(directory, filename)
-        
-        # 读取并打印 JSON 文件的内容
-        with open(file_path, 'r', encoding='utf-8') as file:
-            data = json.load(file)
-            print(f"内容来自 {filename}:")
-            print(json.dumps(data, indent=4))  # 美化输出 JSON 数据
-
-# 假设 JSON 数据存储在 data.json 文件中
-with open('data.json', 'r', encoding='utf-8') as file:
-    data = json.load(file)
-
-# 使用 pandas 的 json_normalize 扁平化嵌套数据
-df = pd.json_normalize(data, record_path=['resources'])
-
-# 输出 name 字段
-print(df['name'])
-
+tcp_traceroute("teams.microsoft.com")
