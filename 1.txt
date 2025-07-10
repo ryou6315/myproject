@@ -1,14 +1,11 @@
-def fix_json_format(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        content = file.read()
-        # 尝试删除字符串末尾的多余逗号
-        content = content.rstrip(',')  # 删除结尾多余的逗号
-        # 其他格式修复可以根据具体问题添加
-        return content
+import subprocess
 
-try:
-    corrected_json = fix_json_format('data.json')
-    data = json.loads(corrected_json)  # 使用字符串加载修正后的内容
-    print(data)
-except json.JSONDecodeError as e:
-    print(f"修复后的JSON仍然有问题: {e}")
+def trace_route(domain):
+    try:
+        result = subprocess.run(["tracert", domain], capture_output=True, text=True, timeout=30)
+        return result.stdout
+    except Exception as e:
+        return f"tracert failed: {e}"
+
+trace_result = trace_route("outlook.office.com")
+print(trace_result)
