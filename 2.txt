@@ -1,23 +1,12 @@
-from scapy.all import IP, TCP, sr1
-import time
+from scapy.all import IP, ICMP, sr1
 
-def tcp_traceroute(dest, port=443, max_hops=30):
-    print(f"TCP Traceroute to {dest}:{port}")
-    for ttl in range(1, max_hops + 1):
-        pkt = IP(dst=dest, ttl=ttl) / TCP(dport=port, flags="S")
-        start = time.time()
+def get_first_hops(dest, hops=3):
+    for ttl in range(1, hops+1):
+        pkt = IP(dst=dest, ttl=ttl) / ICMP()
         reply = sr1(pkt, timeout=2, verbose=0)
-        rtt = (time.time() - start) * 1000
-        if reply is None:
-            print(f"{ttl}\t*")
-        elif reply.haslayer("TCP"):
-            print(f"{ttl}\t{reply.src}\t{round(rtt,2)} ms\tTCP响应")
-            if reply.getlayer("TCP").flags == 0x12:  # SYN-ACK
-                print("🎯 到达目标")
-                break
-        elif reply.haslayer("ICMP"):
-            print(f"{ttl}\t{reply.src}\t{round(rtt,2)} ms\tICMP响应")
+        if reply:
+            print(f"Hop {ttl}: {reply.src}")
         else:
-            print(f"{ttl}\t未知响应")
+            print(f"Hop {ttl}: *")
 
-tcp_traceroute("teams.microsoft.com")
+get_first_hops("8.8.8.8")
