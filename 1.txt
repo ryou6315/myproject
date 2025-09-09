@@ -1,47 +1,80 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>简单登录页面</title>
-    <style>
-        body { font-family: Arial; margin: 50px; }
-        .login-container { max-width: 300px; margin: auto; }
-        label { display: block; margin-top: 10px; }
-        input { width: 100%; padding: 8px; margin-top: 5px; }
-        button { margin-top: 15px; width: 100%; padding: 10px; }
-        .message { color: red; margin-top: 10px; }
-    </style>
-</head>
-<body>
-    <div class="login-container">
-        <h2>登录</h2>
-        <form id="loginForm">
-            <label>用户名:
-                <input type="text" id="username" required>
-            </label>
-            <label>密码:
-                <input type="password" id="password" required>
-            </label>
-            <button type="submit">登录</button>
-            <div class="message" id="message"></div>
-        </form>
-    </div>
+一、生成私钥 + 自签名 CA 根证书
 
-    <script>
-        const form = document.getElementById("loginForm");
-        form.addEventListener("submit", function(event) {
-            event.preventDefault();
-            const username = document.getElementById("username").value;
-            const password = document.getElementById("password").value;
+先生成一个“根证书颁发机构 (CA)”，以后用它来签发服务端证书。
 
-            // 模拟验证
-            if (username === "user1" && password === "123456") {
-                alert("登录成功！");
-                window.location.href = "welcome.html"; // 登录成功跳转页面
-            } else {
-                document.getElementById("message").textContent = "用户名或密码错误";
-            }
-        });
-    </script>
-</body>
-</html>
+# 1. 生成 CA 私钥
+openssl genrsa -out ca.key 2048
+
+# 2. 生成 CA 自签名根证书 (有效期 10 年)
+openssl req -x509 -new -nodes -key ca.key -sha256 -days 3650 -out ca.crt \
+  -subj "/C=JP/ST=Tokyo/L=Tokyo/O=MyCompany/OU=IT/CN=MyRootCA"
+
+
+会得到两个文件：
+
+ca.key → CA 的私钥
+
+ca.crt → CA 的根证书
+
+📜 二、生成服务端私钥 + 证书签名请求 (CSR)
+
+给你的 Apache 或 Java 服务生成证书。
+
+# 1. 生成服务端私钥
+openssl genrsa -out server.key 2048
+
+# 2. 生成证书签名请求 (CSR)
+openssl req -new -key server.key -out server.csr \
+  -subj "/C=JP/ST=Tokyo/L=Tokyo/O=MyCompany/OU=IT/CN=localhost"
+
+
+会得到：
+
+server.key → 服务端私钥
+
+server.csr → 等待 CA 签发的证书请求
+
+✅ 三、用 CA 签发服务端证书 (CRT)
+
+用前面生成的 CA 根证书去签发：
+
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
+  -out server.crt -days 365 -sha256
+
+
+结果：
+
+server.crt → 服务端公钥证书
+
+ca.crt → 根证书（客户端要导入）
+
+server.key → 服务端私钥
+
+🎯 四、打包成 JKS（如果要给 JMeter / Tomcat 用）
+
+先把 服务端证书 + 私钥 合成 PKCS12 文件：
+
+openssl pkcs12 -export -in server.crt -inkey server.key -out server.p12 \
+  -name myserver -CAfile ca.crt -caname root
+
+
+再用 keytool 转换成 JKS：
+
+keytool -importkeystore \
+  -destkeystore keystore.jks \
+  -srckeystore server.p12 \
+  -srcstoretype PKCS12 \
+  -alias myserver
+
+
+👉 这样，你就完整地生成了：
+
+CA 根证书：ca.crt
+
+服务端证书：server.crt
+
+服务端私钥：server.key
+
+最终 Java 可用：keystore.jks
+
+要不要我帮你整理一个 最小可执行脚本（一步步跑下来，自动生成所有 key/crt/jks）？这样你只需要复制粘贴就能得到完整证书链。
