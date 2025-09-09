@@ -1,35 +1,47 @@
-import os
-import json
-import csv
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>简单登录页面</title>
+    <style>
+        body { font-family: Arial; margin: 50px; }
+        .login-container { max-width: 300px; margin: auto; }
+        label { display: block; margin-top: 10px; }
+        input { width: 100%; padding: 8px; margin-top: 5px; }
+        button { margin-top: 15px; width: 100%; padding: 10px; }
+        .message { color: red; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>登录</h2>
+        <form id="loginForm">
+            <label>用户名:
+                <input type="text" id="username" required>
+            </label>
+            <label>密码:
+                <input type="password" id="password" required>
+            </label>
+            <button type="submit">登录</button>
+            <div class="message" id="message"></div>
+        </form>
+    </div>
 
-# 指定包含ADF JSON文件的目录路径
-json_dir = 'your_adf_export_folder'
+    <script>
+        const form = document.getElementById("loginForm");
+        form.addEventListener("submit", function(event) {
+            event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
 
-# 输出的CSV文件
-output_csv = 'adf_summary.csv'
-
-# 打开CSV文件用于写入
-with open(output_csv, mode='w', newline='', encoding='utf-8') as csvfile:
-    writer = csv.writer(csvfile)
-    # 写入CSV表头
-    writer.writerow(['file_name', 'resource_name', 'lastPublishedTime'])
-
-    # 遍历目录中的每个文件
-    for filename in os.listdir(json_dir):
-        if filename.endswith('.json'):
-            file_path = os.path.join(json_dir, filename)
-            try:
-                with open(file_path, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-
-                    # 提取 lastPublishedTime，如果没有设置为空
-                    last_published = data.get('lastPublishedTime', '')
-
-                    # 遍历 resources 数组
-                    resources = data.get('resources', [])
-                    for res in resources:
-                        name = res.get('name', '')
-                        writer.writerow([filename, name, last_published])
-
-            except Exception as e:
-                print(f"解析文件 {filename} 出错：{e}")
+            // 模拟验证
+            if (username === "user1" && password === "123456") {
+                alert("登录成功！");
+                window.location.href = "welcome.html"; // 登录成功跳转页面
+            } else {
+                document.getElementById("message").textContent = "用户名或密码错误";
+            }
+        });
+    </script>
+</body>
+</html>
