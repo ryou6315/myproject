@@ -1,1 +1,15 @@
-11
+import re
+
+text = """Q.  第一题
+Q1. 第二题
+Q23.　第三题(全角空格)
+Q3.\t第四题(Tab)
+这是正文 Q1. 不应被改
+"""
+
+# \d* 匹配零个或多个数字
+# \x20* 只匹配半角空格
+pattern = r'(?m)^Q\d*\.\x20*'
+
+result = re.sub(pattern, '', text)
+print(result)
