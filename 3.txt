@@ -1,15 +1,19 @@
-import re
+import csv
 
-text = """Q.  第一题
-Q1. 第二题
-Q23.　第三题(全角空格)
-Q3.\t第四题(Tab)
-这是正文 Q1. 不应被改
-"""
+# 读取原始 CSV
+input_file = "input.csv"
+output_file = "output.csv"
 
-# \d* 匹配零个或多个数字
-# \x20* 只匹配半角空格
-pattern = r'(?m)^Q\d*\.\x20*'
+with open(input_file, newline="", encoding="utf-8") as fin, \
+     open(output_file, "w", newline="", encoding="utf-8") as fout:
 
-result = re.sub(pattern, '', text)
-print(result)
+    reader = csv.reader(fin)
+    writer = csv.writer(fout)
+
+    # 先写表头
+    header = next(reader)
+    writer.writerow(header)
+
+    # 写数据（全加引号）
+    quoted_writer = csv.writer(fout, quoting=csv.QUOTE_ALL)
+    quoted_writer.writerows(reader)
