@@ -1,40 +1,69 @@
-import requests
+package basicweb;
 
-# === 1️⃣ Okta 域名 ===
-OKTA_DOMAIN = "https://dev-123456.okta.com"  # ← 改成你的 Okta 域名
+import org.openqa.selenium.By;
 
-# === 2️⃣ 用户列表 ===
-users = [
-    {"username": "user1@example.com", "password": "Password123!"},
-    {"username": "user2@example.com", "password": "Password456!"},
-    {"username": "user3@example.com", "password": "Password789!"},
-]
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.junit.Test;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+public class MyNecLoginTest {
 
-# === 3️⃣ 登录函数 ===
-def login_user(username, password):
-    url = f"{OKTA_DOMAIN}/api/v1/authn"
-    payload = {
-        "username": username,
-        "password": password
-    }
+	//public static void main(String[] args) {
+	@Test
+	public void test() {
+		ChromeOptions options = new ChromeOptions();
+		// 绕过安全阻止
+		//options.addArguments("--disable-blink-features=AutomationControlled");
+		//options.addArguments("--disable-popup-blocking");
+		//options.addArguments("--user-data-dir=/tmp/chrome-profile");
+        
+		System.setProperty("webdriver.chrome.driver","D:\\12.个人开发\\6.Nec工作\\JMeter\\Selenium-Test\\libs\\chromedriver-win64\\chromedriver.exe");
+		WebDriver driver = new ChromeDriver();
+			
+		String username_pre = "";
+        String password_pre = "";
+        String url = "https://" + username_pre + ":" + password_pre + "@neciexpodev.prod.acquia-sites.com/login";
+        driver.get(url);
+        
+        
+		driver.get("");
+		System.out.println(driver.getTitle());
+		
+		// WebElement username = driver.findElement(By.id("okta-signin-username"));
+		driver.manage().window().maximize();
+		
+		WebElement username = driver.findElement(By.id("okta-signin-username"));
+	    username.sendKeys("outest02");
 
-    try:
-        response = requests.post(url, json=payload, headers={"Accept": "application/json"})
-        if response.status_code == 200:
-            data = response.json()
-            if data.get("status") == "SUCCESS":
-                token = data.get("sessionToken")
-                print(f"✅ 登录成功: {username}")
-                print(f"   sessionToken: {token}\n")
-                return token
-            else:
-                print(f"⚠️ 登录状态: {data.get('status')} (用户: {username})")
-        else:
-            print(f"❌ 登录失败 ({username}) - HTTP {response.status_code}")
-            print(response.text)
-    except Exception as e:
-        print(f"🚨 登录时出错 ({username}): {e}")
 
-# === 4️⃣ 依次登录每个用户 ===
-for user in users:
-    login_user(user["username"], user["password"])
+        // 通过 ID 定位密码框
+        WebElement password = driver.findElement(By.id("okta-signin-password"));
+        password.sendKeys("!");
+        
+        // 点击登录按钮
+        WebElement loginButton = driver.findElement(By.id("okta-signin-submit"));
+        loginButton.click();
+        
+        
+        // 等待页面加载完成
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+
+        // 定位并点击按钮
+        WebElement btn = driver.findElement(By.cssSelector("#navbarToggleExternalContent2 > div > a:nth-child(1)"));
+        btn.click();
+
+        System.out.println("按钮已点击！");
+
+
+        // 等待几秒查看效果
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+	}
+ 
+}
