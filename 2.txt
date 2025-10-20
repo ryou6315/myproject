@@ -1,5 +1,0 @@
-   <Directory "C:/Apache24/htdocs">
-        Options Indexes FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
