@@ -1,3 +1,10 @@
+//		Browser browser = playwright.chromium().launch(
+//			    new BrowserType.LaunchOptions()
+//			        .setChannel("msedge")   // 或 "msedge"
+//			        .setHeadless(false)
+//			);
+
+
 package playweb;
 
 import com.microsoft.playwright.Browser;
@@ -8,9 +15,9 @@ import com.microsoft.playwright.Page;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.WaitUntilState;
 public class PlayTest2 {
-//d
 
-	 public static void main(String[] args) throws InterruptedException {
+
+public static void main(String[] args) throws InterruptedException {
 
  // 新建干净上下文
 		
