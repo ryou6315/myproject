@@ -1,16 +1,14 @@
-import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
-import org.apache.jmeter.samplers.SampleResult;
+package com.example.playwright;
 
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
-        <version>2.20.0</version>
-    </dependency>
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-    <!-- log4j2 核心实现 -->
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>2.20.0</version>
-    </dependency>
+public class PlaywrightLogin {
+    private static final Logger log = LogManager.getLogger(PlaywrightLogin.class);
+
+    public static void login(String username, String password) {
+        log.info("用户 {} 开始登录", username);
+        // Playwright 登录逻辑
+        log.info("用户 {} 登录完成", username);
+    }
+}
