@@ -1,3 +1,17 @@
-https://stackoverflow.com/questions/70111344/remote-host-terminated-the-handshake-in-jmeter
+npm install -D @playwright/test
 
-Remote host terminated the handshake In JMeter
+npx playwright install chrome
+
+npx playwright install --list
+
+
+<dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.17.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>2.17.2</version>
+    </dependency>
