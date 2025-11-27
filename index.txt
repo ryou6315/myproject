@@ -1,109 +1,29 @@
-package playweb;
+https://login.microsoftonline.com/2e0933d6-276b-448e-9038-7da603bc6712/saml2
 
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserContext;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Locator;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
-import com.microsoft.playwright.PlaywrightException;
-import com.microsoft.playwright.options.WaitUntilState;
+https://sts.windows.net/2e0933d6-276b-448e-9038-7da603bc6712/
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-
-public class PlayLoginPrint {
-//d
-	private static final Logger log = LogManager.getLogger(PlayLoginPrint.class);
-	 public static void main(String[] args) throws InterruptedException {
-		
-		String userHome = System.getProperty("user.home");
-		String javahome = System.getenv("JAVA_HOME");
-		//String userDataDir = "C:\\Users\\AppData\\Local\\Google\\Chrome\\User Data";
-		//String userDataDir = userHome + "\\AppData\\Local\\Google\\Chrome\\User Data";
-		String userDataDir = "C:\\Users\\ken\\AppData\\Local\\ms-playwright\\chromium-1148";
-		
-		
-		System.out.print(userDataDir);
-		log.info("javahome：{}", javahome);
-		LocalDateTime now =  LocalDateTime.now();
-		log.info("开始时间：{}", now);
-
-		try (Playwright playwright = Playwright.create()) {
-            BrowserContext context = playwright.chromium().launchPersistentContext(
-                Paths.get(userDataDir),
-                new BrowserType.LaunchPersistentContextOptions()
-                    .setChannel("chrome") 
-                    .setHeadless(true)
-                    .setArgs(Arrays.asList(
-                        "--start-maximized",
-                        "--no-sandbox"
-                    ))
-            );
-		//BrowserContext context = browser.newContext();
-        Page page = context.newPage();
-//        page.navigate("about:blank");
-//        page.close();
-        page.navigate("https://opensource-demo.orangehrmlive.com");
-        
-        
-        page.locator("input[name='username']").fill("Admin");
-        page.locator("input[name='password']").fill("admin123");
-        page.locator("button[type='submit']").click();
-        setWaitUntil(WaitUntilState.NETWORKIDLE);
-        Thread.sleep(2000);
-        page.waitForSelector(".oxd-main-menu-item");
-        page.locator("a:has-text('PIM')").click();
-        //page.locator("a:has-text('管理员')").click();
-        //Thread.sleep(2000);
-        page.locator("input.oxd-input").nth(1).fill("0312");
-        //page.locator("button:has-text('搜索')").click();
-        page.locator("button:has-text('Search')").click();
-        
-        //Thread.sleep(2000);
-	     Locator button = page.locator("button.oxd-button--ghost");
-	     String text = button.innerText();
-	    
-	     //終了時間
-	     LocalDateTime  finish =  LocalDateTime.now(); 
-	     
-	     if(text != null && !text.trim().isEmpty()) {
-		     System.out.println("按钮文字: " + text);
-	    	 log.info("終了時間：{}", now);
-	     }
-	     Duration duration = Duration.between(now, finish);
-	     long seconds = duration.getSeconds();
-	     long millis = duration.toMillis();
-	     String begintxt = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-	     String finishtxt = finish.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-	     
-	     log.info("開始时间：{} 終了时间：{}　間隔时间：{}",begintxt,finishtxt,millis);
-         
-	      Thread.sleep(5000);
-	      page.close();
-	      playwright.close();
-		}catch (PlaywrightException e) {
-		    System.err.println("Playwright の初期化または操作に失敗しました: " + e.getMessage());
-		    e.printStackTrace();
-		} catch (Exception e) {
-		    System.err.println("その他のエラーが発生しました: " + e.getMessage());
-		    e.printStackTrace();
-		}
-		
-		
-
-
-	}
-
-	 private static void setWaitUntil(WaitUntilState networkidle) {
-		// TODO Auto-generated method stub
-		
-	 }
-
-}
+#####################################################
+http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress
+0
+0
+SAML
+user.mail
+#####################################################
+http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname
+0
+0
+SAML
+user.givenname
+#####################################################
+http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name
+0
+0
+SAML
+user.userprincipalname
+#####################################################
+http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname
+0
+0
+SAML
+user.surname
+#####################################################
