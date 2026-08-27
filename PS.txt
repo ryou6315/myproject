@@ -1,147 +1,43 @@
-Okta Passkey 設定・設計の要点
-1. Passkey の基本
-Okta では Passkey を FIDO2 / WebAuthn Authenticator として扱う。
-Passkey は公開鍵暗号方式を利用するため、パスワードをサーバーに送信する必要がない。
-指紋、顔認証、PIN などによるユーザー検証が可能。
-フィッシング耐性を持つ認証方式である。
-PC とスマートフォンを組み合わせた Cross-Device Authentication（CDA） も利用可能。
-2. Passkey は大きく2種類
+Okta Passkey 設定ガイドの概要
 
-① Synced Passkey（同期型）
+今回、OktaにおけるPasskeyの導入・設定について、Nextmodeの技術記事を参考に整理しました。
 
-クラウド経由で複数デバイスに同期される。
-例：iCloud Keychain、Google Password Manager、Keeper など。
-端末を紛失しても復旧しやすい。
-一方、クラウドアカウント侵害時のリスクを考慮する必要がある。
+Passkeyは、FIDO2 / WebAuthnをベースとした認証方式で、パスワードの代わりに公開鍵暗号（あんごう）方式を利用します。そのため、フィッシングに強く、指紋（しもん）認証や顔認証、PINなどを利用して安全にログインすることができます。
 
-② Device-bound Passkey（デバイス固定型）
+Oktaでは、Passkeyは「FIDO2（WebAuthn）Authenticator」として提供されています。Sign-In Widgetでは、「Security Key or Biometric Authenticator」という名称で表示され、Passkeyによる認証を行います。
 
-特定のデバイスに保存され、基本的にエクスポートできない。
-例：Windows Hello、YubiKey などの FIDO2 Security Key。
-セキュリティを重視する場合に適している。
-3. Okta で重要な設定
-FIDO2 (WebAuthn)
+導入する際の重要なポイントとして、まずRelying Party ID、つまりRP IDを決める必要があります。PasskeyはRP IDに紐付（ひもつき）いているため、後からRP IDを変更すると、既存のPasskeyを利用できなくなる可能性があります。
 
-Okta Admin Console では、Passkey が必ずしも「Passkey」という名前で表示されるわけではなく、基本的には FIDO2 (WebAuthn) として設定する。
+また、Passkeyには、iCloud KeychainやGoogle Password Managerなどを利用する「同期Passkey」と、Windows HelloやYubiKeyなどの「デバイス固定（こてい）Passkey」があります。そのため、会社のセキュリティ要件に応じて、同期Passkeyを許可するか、あるいはブロックするかを事前に検討する必要があります。
 
-また、Sign-In Widget では「Security Key or Biometric Authenticator」と表示される場合がある。
+さらに、Okta FastPassとの使い分けも重要です。管理された社内端末ではOkta FastPass、一般ユーザー（MYNEC）ではPasskeyを利用するという考え方が紹介されています。ただし、両者を併用（へいよう）することも可能です。
 
-Block synced passkeys
+まとめると、Passkeyの導入では、単にAuthenticatorを有効化するだけではなく、RP ID、利用するAuthenticator、同期Passkeyの扱い、紛失（ふんしつ）時のリカバリ方法などを事前に設計することが重要です。
 
-同期型 Passkey を許可するかどうかを決める設定。
+今回の記事を通して、OktaでPasskeyを導入する場合は、管理画面の設定だけではなく、認証方式と運用方法を含めて全体的に設計する必要があると理解しました。
 
-ON → Synced Passkey をブロック
-OFF → Synced Passkey を許可
 
-ただし、この設定は「証明書を検証して同期型か判断する」という仕組みではなく、Okta が同期型 Passkey を作成すると認識している Authenticator をブロックする方式なので注意が必要。
+・同期（どうき）パスキーとデバイス固定パスキー
 
-4. AAGUID が重要
+① 同期パスキー（Synced Passkey）
 
-特定の Passkey / FIDO2 Authenticator だけを許可したい場合は、
+同期パスキーは、クラウドを利用して、複数のデバイスで同じPasskeyを利用できる方式です。
 
-Authenticator Group + AAGUID
+例えば、iPhoneでPasskeyを登録すると、iCloud Keychainを通じてMacなどの別のデバイスにも同期されます。
 
-を利用する。
+② デバイス固定パスキー（Device-bound Passkey）
 
-例えば、
+デバイス固定パスキーは、特定のデバイスやセキュリティキーにPasskeyを保存し、他のデバイスには同期しない方式です。
 
-「一般ユーザーは Windows Hello を使用可能」
-「管理者は会社指定の FIDO2 Security Key のみ使用可能」
+例えば、Windows Helloやセキュリティキーなどが代表的な例です。
 
-というような制御が可能。
-
-さらに、特定の Synced Passkey Provider だけを許可したい場合にも、AAGUID ベースのホワイトリスト方式を検討できる。
-
-5. RP ID は導入前に決める
-
-RP ID（Relying Party ID） は、Passkey が紐付くドメイン。
+・ハードウェア保護
+秘密鍵を、端末のセキュリティ機能（TPMやSecure Enclaveなど）で保護することです。
+Passkeyの秘密鍵を、通常のOS上ではなく、より安全なハードウェア領域に保存・保護する仕組み
 
 例えば：
 
-yourcompany.okta.com
+Windows → TPM （Trusted Platform Module（トラステッド・プラットフォーム・モジュール））
+iPhone / Mac → Secure Enclave （セキュアエンクレーブ）Appleのデバイスに搭載されているハードウェアベースのセキュリティ機能です。
+セキュリティキー → デバイス内部の専用チップ
 
-または
-
-login.yourcompany.co.jp
-
-重要なのは、RP ID を変更すると既存 Passkey が利用できなくなる可能性があること。
-
-そのため、Passkey 導入前に RP ID を決定しておくことが推奨されている。
-
-6. Hardware Protection と Synced は別物
-
-ここはかなり重要。
-
-Hardware Protection ≠ Device-bound
-
-例えば iPhone の Secure Enclave で秘密鍵がハードウェア保護されていても、iCloud Keychain によって Passkey が他の端末へ同期される場合がある。
-
-つまり、
-
-Hardware Protection → 秘密鍵をハードウェアで保護するか
-Synced / Device-bound → Passkey を他のデバイスへ同期できるか
-
-という別々の観点。
-
-7. セキュリティを重視する場合
-
-高セキュリティ環境では、例えば以下のような設計が考えられる。
-
-一般ユーザー
-
-→ Windows Hello / Touch ID など
-
-特権ユーザー
-
-→ FIDO2 Security Key
-
-さらに厳格な環境
-
-→ AAGUID による許可デバイス制限
-→ Attestation の検証
-→ Synced Passkey の制限
-
-という構成。
-
-記事でも、特定の認証器に限定する場合は Authenticator Group + AAGUID を利用する方法が紹介されている。
-
-8. Passkey と Okta FastPass
-
-Okta では、
-
-Passkey（FIDO2/WebAuthn）
-
-と
-
-Okta FastPass（Okta Verify）
-
-の両方がフィッシング耐性を持つ。
-
-大まかな使い分けとして記事では、
-
-社内管理端末（MDM/UEM） → Okta FastPass
-BYOD / 社外ユーザー → Passkey
-
-を基本方針としている。
-
-ただし、両方を併用することも可能。
-
-一言でまとめると
-
-Okta Passkey 導入では、以下の順番で設計するのがポイントです。
-
-① RP IDを決定
-↓
-② 使用するPasskey基盤を決定
-↓
-③ Synced Passkeyを許可するか決定
-↓
-④ 必要ならAAGUIDでAuthenticatorを限定
-↓
-⑤ Authentication Policyを設定
-↓
-⑥ ユーザーにPasskeyを登録させる
-↓
-⑦ 紛失時の再登録・リカバリ方法を準備
-
-特にあなたが前に確認していた OneSpan DIGIPASS FX1 Bio を Okta で利用するケースなら、この記事の中では 「AAGUID」「Authenticator Group」「Device-bound」「Attestation」 の部分が一番重要です。
