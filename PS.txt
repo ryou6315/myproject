@@ -1,17 +1,147 @@
-npm install -D @playwright/test
+Okta Passkey 設定・設計の要点
+1. Passkey の基本
+Okta では Passkey を FIDO2 / WebAuthn Authenticator として扱う。
+Passkey は公開鍵暗号方式を利用するため、パスワードをサーバーに送信する必要がない。
+指紋、顔認証、PIN などによるユーザー検証が可能。
+フィッシング耐性を持つ認証方式である。
+PC とスマートフォンを組み合わせた Cross-Device Authentication（CDA） も利用可能。
+2. Passkey は大きく2種類
 
-npx playwright install chrome
+① Synced Passkey（同期型）
 
-npx playwright install --list
+クラウド経由で複数デバイスに同期される。
+例：iCloud Keychain、Google Password Manager、Keeper など。
+端末を紛失しても復旧しやすい。
+一方、クラウドアカウント侵害時のリスクを考慮する必要がある。
 
+② Device-bound Passkey（デバイス固定型）
 
-<dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>2.17.2</version>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
-        <version>2.17.2</version>
-    </dependency>
+特定のデバイスに保存され、基本的にエクスポートできない。
+例：Windows Hello、YubiKey などの FIDO2 Security Key。
+セキュリティを重視する場合に適している。
+3. Okta で重要な設定
+FIDO2 (WebAuthn)
+
+Okta Admin Console では、Passkey が必ずしも「Passkey」という名前で表示されるわけではなく、基本的には FIDO2 (WebAuthn) として設定する。
+
+また、Sign-In Widget では「Security Key or Biometric Authenticator」と表示される場合がある。
+
+Block synced passkeys
+
+同期型 Passkey を許可するかどうかを決める設定。
+
+ON → Synced Passkey をブロック
+OFF → Synced Passkey を許可
+
+ただし、この設定は「証明書を検証して同期型か判断する」という仕組みではなく、Okta が同期型 Passkey を作成すると認識している Authenticator をブロックする方式なので注意が必要。
+
+4. AAGUID が重要
+
+特定の Passkey / FIDO2 Authenticator だけを許可したい場合は、
+
+Authenticator Group + AAGUID
+
+を利用する。
+
+例えば、
+
+「一般ユーザーは Windows Hello を使用可能」
+「管理者は会社指定の FIDO2 Security Key のみ使用可能」
+
+というような制御が可能。
+
+さらに、特定の Synced Passkey Provider だけを許可したい場合にも、AAGUID ベースのホワイトリスト方式を検討できる。
+
+5. RP ID は導入前に決める
+
+RP ID（Relying Party ID） は、Passkey が紐付くドメイン。
+
+例えば：
+
+yourcompany.okta.com
+
+または
+
+login.yourcompany.co.jp
+
+重要なのは、RP ID を変更すると既存 Passkey が利用できなくなる可能性があること。
+
+そのため、Passkey 導入前に RP ID を決定しておくことが推奨されている。
+
+6. Hardware Protection と Synced は別物
+
+ここはかなり重要。
+
+Hardware Protection ≠ Device-bound
+
+例えば iPhone の Secure Enclave で秘密鍵がハードウェア保護されていても、iCloud Keychain によって Passkey が他の端末へ同期される場合がある。
+
+つまり、
+
+Hardware Protection → 秘密鍵をハードウェアで保護するか
+Synced / Device-bound → Passkey を他のデバイスへ同期できるか
+
+という別々の観点。
+
+7. セキュリティを重視する場合
+
+高セキュリティ環境では、例えば以下のような設計が考えられる。
+
+一般ユーザー
+
+→ Windows Hello / Touch ID など
+
+特権ユーザー
+
+→ FIDO2 Security Key
+
+さらに厳格な環境
+
+→ AAGUID による許可デバイス制限
+→ Attestation の検証
+→ Synced Passkey の制限
+
+という構成。
+
+記事でも、特定の認証器に限定する場合は Authenticator Group + AAGUID を利用する方法が紹介されている。
+
+8. Passkey と Okta FastPass
+
+Okta では、
+
+Passkey（FIDO2/WebAuthn）
+
+と
+
+Okta FastPass（Okta Verify）
+
+の両方がフィッシング耐性を持つ。
+
+大まかな使い分けとして記事では、
+
+社内管理端末（MDM/UEM） → Okta FastPass
+BYOD / 社外ユーザー → Passkey
+
+を基本方針としている。
+
+ただし、両方を併用することも可能。
+
+一言でまとめると
+
+Okta Passkey 導入では、以下の順番で設計するのがポイントです。
+
+① RP IDを決定
+↓
+② 使用するPasskey基盤を決定
+↓
+③ Synced Passkeyを許可するか決定
+↓
+④ 必要ならAAGUIDでAuthenticatorを限定
+↓
+⑤ Authentication Policyを設定
+↓
+⑥ ユーザーにPasskeyを登録させる
+↓
+⑦ 紛失時の再登録・リカバリ方法を準備
+
+特にあなたが前に確認していた OneSpan DIGIPASS FX1 Bio を Okta で利用するケースなら、この記事の中では 「AAGUID」「Authenticator Group」「Device-bound」「Attestation」 の部分が一番重要です。
