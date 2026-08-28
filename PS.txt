@@ -1,43 +1,11 @@
-Okta Passkey 設定ガイドの概要
-
-今回、OktaにおけるPasskeyの導入・設定について、Nextmodeの技術記事を参考に整理しました。
-
-Passkeyは、FIDO2 / WebAuthnをベースとした認証方式で、パスワードの代わりに公開鍵暗号（あんごう）方式を利用します。そのため、フィッシングに強く、指紋（しもん）認証や顔認証、PINなどを利用して安全にログインすることができます。
-
-Oktaでは、Passkeyは「FIDO2（WebAuthn）Authenticator」として提供されています。Sign-In Widgetでは、「Security Key or Biometric Authenticator」という名称で表示され、Passkeyによる認証を行います。
-
-導入する際の重要なポイントとして、まずRelying Party ID、つまりRP IDを決める必要があります。PasskeyはRP IDに紐付（ひもつき）いているため、後からRP IDを変更すると、既存のPasskeyを利用できなくなる可能性があります。
-
-また、Passkeyには、iCloud KeychainやGoogle Password Managerなどを利用する「同期Passkey」と、Windows HelloやYubiKeyなどの「デバイス固定（こてい）Passkey」があります。そのため、会社のセキュリティ要件に応じて、同期Passkeyを許可するか、あるいはブロックするかを事前に検討する必要があります。
-
-さらに、Okta FastPassとの使い分けも重要です。管理された社内端末ではOkta FastPass、一般ユーザー（MYNEC）ではPasskeyを利用するという考え方が紹介されています。ただし、両者を併用（へいよう）することも可能です。
-
-まとめると、Passkeyの導入では、単にAuthenticatorを有効化するだけではなく、RP ID、利用するAuthenticator、同期Passkeyの扱い、紛失（ふんしつ）時のリカバリ方法などを事前に設計することが重要です。
-
-今回の記事を通して、OktaでPasskeyを導入する場合は、管理画面の設定だけではなく、認証方式と運用方法を含めて全体的に設計する必要があると理解しました。
-
-
-・同期（どうき）パスキーとデバイス固定パスキー
-
-① 同期パスキー（Synced Passkey）
-
-同期パスキーは、クラウドを利用して、複数のデバイスで同じPasskeyを利用できる方式です。
-
-例えば、iPhoneでPasskeyを登録すると、iCloud Keychainを通じてMacなどの別のデバイスにも同期されます。
-
-② デバイス固定パスキー（Device-bound Passkey）
-
-デバイス固定パスキーは、特定のデバイスやセキュリティキーにPasskeyを保存し、他のデバイスには同期しない方式です。
-
-例えば、Windows Helloやセキュリティキーなどが代表的な例です。
-
-・ハードウェア保護
-秘密鍵を、端末のセキュリティ機能（TPMやSecure Enclaveなど）で保護することです。
-Passkeyの秘密鍵を、通常のOS上ではなく、より安全なハードウェア領域に保存・保護する仕組み
-
-例えば：
-
-Windows → TPM （Trusted Platform Module（トラステッド・プラットフォーム・モジュール））
-iPhone / Mac → Secure Enclave （セキュアエンクレーブ）Appleのデバイスに搭載されているハードウェアベースのセキュリティ機能です。
-セキュリティキー → デバイス内部の専用チップ
-
+Passkeyのデメリット
+1.デバイス紛失時のリカバリ
+端末を紛失・故障すると、Passkeyを再登録する必要がある場合があります。
+2.同期パスキーのセキュリティ管理
+iCloud KeychainやGoogle Password Managerなど、Passkeyが複数の端末に同期されるため、企業では利用可否の検討が必要です。
+3.デバイス・ブラウザの互換性
+OSやブラウザによって、Passkeyの対応状況やユーザー体験が異なる場合があります。
+4.デバイス変更時の対応
+同期パスキーなら移行しやすいですが、デバイス固定パスキーの場合は再登録が必要になることがあります。
+5.企業での運用管理
+Passkeyの登録・削除、端末紛失、ユーザーの再登録など、運用ルールを事前に決める必要があります。
