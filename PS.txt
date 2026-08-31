@@ -1,2 +1,3 @@
-Windows Hello / Touch ID → Device-bound
-iPhone / Android → CDA
+現行のUser Profileには、Passkey利用ユーザーであることを識別するための標準的な属性・情報は存在しない。
+
+そのため、現時点では、Passkey認証を利用しているユーザーと、パスワード認証のみを利用している一般ユーザーを、User Profile上で明確に区別することはできない。
