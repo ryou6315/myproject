@@ -1,3 +1,17 @@
-現行のUser Profileには、Passkey利用ユーザーであることを識別するための標準的な属性・情報は存在しない。
+件名: iCloudキーチェーン (Apple Passwords) を利用したFIDO2 (WebAuthn) 設定に関する確認
 
-そのため、現時点では、Passkey認証を利用しているユーザーと、パスワード認証のみを利用している一般ユーザーを、User Profile上で明確に区別することはできない。
+お世話になっております。[会社名] の [担当者名] と申します。
+
+Okta Authenticators にて「FIDO2 (WebAuthn)」を新規追加し、ユーザーが iCloud キーチェーン（Apple Passwords / パスキー）を利用して同期・認証できるように設定を検討しております。
+
+これに伴い、以下の2点について Okta の推奨設定および仕様をご教示いただけますでしょうか。
+
+1. AAGUID の設定について
+   iCloud キーチェーンからの登録のみに制限（または識別）するため、カスタム AAGUID の登録を検討しています。
+   Apple の iCloud キーチェーン用 AAGUID (ea9b8d66-4d01-521a-886b-d1b028a0f569) を登録する形であ認識は正しいでしょうか。また、Okta 側で Apple Passkey 用の推奨 AAGUID 設定値や制限手順がございましたらご教示ください。
+
+2. 証明書ベースの認証検証 (Attestation) の設定について
+   Apple Passkey は証明書アテステーションを伴わない（または None/Direct）仕様と認識しております。
+   Okta の FIDO2 設定内にある「証明書ベースの認証検証 (Attestation Verification)」項目は、どのように設定するのが推奨されますでしょうか。（例: 「None」に設定する必要があるか等）
+
+お忙しいところ恐れ入りますが、ご回答のほどよろしくお願いいたします。
