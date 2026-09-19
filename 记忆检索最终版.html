@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>日语罗马字与假名例词速查表 (单文件离线版)</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 16px;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    /* Header */
+    header {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .header-content {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .title-area h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #1e1b4b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .title-area p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-primary {
+      background: #eef2ff;
+      color: var(--primary);
+      border: 1px solid #c7d2fe;
+    }
+    /* Search Box */
+    .search-card {
+      background: #ffffff;
+      padding: 20px 24px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+    .search-input-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 12px 42px 12px 16px;
+      font-size: 16px;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      background: #f8fafc;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    .clear-btn {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #e2e8f0;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #64748b;
+    }
+    .clear-btn:hover {
+      background: #cbd5e1;
+      color: #0f172a;
+    }
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 12px;
+    }
+    .tag-btn {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      padding: 4px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .tag-btn:hover {
+      background: #e0e7ff;
+      color: #3730a3;
+      border-color: #c7d2fe;
+    }
+    /* Info Bar */
+    .info-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 0 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .info-tags {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .matched-chip {
+      background: #e0e7ff;
+      color: #3730a3;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    /* Table */
+    .table-container {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+    thead th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      padding: 10px 12px;
+      border-bottom: 2px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      white-space: nowrap;
+      text-align: center;
+    }
+    thead th:last-child {
+      border-right: none;
+    }
+    .sub-head th {
+      background: #f1f5f9;
+      font-size: 12px;
+      padding: 8px 10px;
+    }
+    tbody tr {
+      border-bottom: 1px solid #f1f5f9;
+      transition: background 0.15s;
+    }
+    tbody tr:hover {
+      background: #f8fafc;
+    }
+    tbody td {
+      padding: 10px 12px;
+      border-right: 1px solid #f1f5f9;
+      vertical-align: middle;
+    }
+    tbody td:last-child {
+      border-right: none;
+    }
+    .kana-cell {
+      text-align: center;
+      background: #fafafa;
+      min-width: 80px;
+    }
+    .kana-main {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .kana-romaji {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: monospace;
+    }
+    .sound-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #94a3b8;
+      padding: 2px;
+      border-radius: 4px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .sound-btn:hover {
+      color: var(--primary);
+      background: #eef2ff;
+    }
+    .code-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 11px;
+      text-align: center;
+    }
+    .code-1 { background: #dcfce7; color: #166534; }
+    .code-2 { background: #fef3c7; color: #92400e; }
+    .code-3 { background: #ffedd5; color: #9a3412; }
+    .code-4 { background: #dbeafe; color: #1e40af; }
+    .empty-block {
+      height: 22px;
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    mark {
+      background: #fef08a;
+      color: #854d0e;
+      padding: 0 2px;
+      border-radius: 2px;
+      font-weight: 700;
+    }
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--text-muted);
+    }
+    /* Footer */
+    footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+<script src="/_aistudio-iframe.js?v=2f1c016a"></script></head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="title-area">
+        <h1>
+          <span>🇯🇵 日语罗马字与假名例词速查表</span>
+          <span class="badge badge-primary">单文件纯HTML版</span>
+        </h1>
+        <p>基于音图关键字精确匹配，支持连续假名（如「あい」、「なければ」）、罗马字（如「ai」、「nakereba」）智能切分与标准日语发音</p>
+      </div>
+      <div>
+        <button class="tag-btn" style="background:#4f46e5;color:#fff;" onclick="window.print()">🖨️ 打印表格</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search Area wrapped in a form that handles Enter cleanly without page refresh -->
+  <div class="search-card">
+    <form id="searchForm" onsubmit="event.preventDefault(); renderTable(); return false;">
+      <div class="search-input-wrap">
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="输入假名（例如: あい, なければ）、罗马字（例如: ai, ka, shi, tsu）或中文（例如: 狗, 医生），按回车或实时查询..."
+          autocomplete="off"
+          autofocus
+        />
+        <button type="button" id="clearBtn" class="clear-btn" title="清空" style="display:none;">✕</button>
+      </div>
+    </form>
+
+    <!-- Quick Tags -->
+    <div class="tags-row">
+      <span style="color:#64748b;font-weight:600;">快捷试用:</span>
+      <button type="button" class="tag-btn" onclick="setQuery('ああ')">ああ (重复音2个结果)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('あい')">あい (2个音图)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('なければ')">なければ (4个音图)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('aa')">aa (2个 a)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('nakereba')">nakereba</button>
+      <button type="button" class="tag-btn" onclick="setQuery('あいうえお')">あいうえお (5个音图)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('ka')">ka (か)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('shi')">shi (し)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('狗')">狗 (例词匹配)</button>
+      <button type="button" class="tag-btn" onclick="setQuery('')">显示全部 64 音</button>
+    </div>
+  </div>
+
+  <!-- Info Bar -->
+  <div class="info-bar">
+    <div class="info-tags" id="infoTags">
+      <span>显示结果: <strong id="matchCount" style="color:#0f172a;">64</strong> / 64 个音图</span>
+    </div>
+    <span>💡 提示: 点击喇叭图标可朗读标准日语发音 · 支持按回车确定</span>
+  </div>
+
+  <!-- 10-Column Table -->
+  <div class="table-container">
+    <table id="kanaTable">
+      <thead>
+        <tr>
+          <th rowspan="2" style="width: 100px;">音图</th>
+          <th colspan="3" style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">例词 1</th>
+          <th colspan="3" style="background:#f1f5f9; border-bottom:1px solid #e2e8f0;">例词 2</th>
+          <th colspan="3" style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">例词 3</th>
+        </tr>
+        <tr class="sub-head">
+          <th>例词日</th>
+          <th>例词中</th>
+          <th>编码</th>
+          <th>例词日</th>
+          <th>例词中</th>
+          <th>编码</th>
+          <th>例词日</th>
+          <th>例词中</th>
+          <th>编码</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- Rendered by JS -->
+      </tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <p style="font-size:16px;font-weight:600;">未找到匹配的音图或例词</p>
+      <p style="font-size:13px;margin-top:6px;">请尝试输入如「あい」、「なければ」、「ka」、「shi」、「狗」等</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>日语假名与罗马字例词对照速查工具 · 纯单文件 HTML 离线运行版</p>
+  </footer>
+</div>
+
+<script>
+// 64 Full Kana Dataset with Exact Matches
+const KANA_DATA = [
+  // A行
+  { id: 'a', kana: 'あ', katakana: 'ア', romaji: 'a', romajiList: ['a'], examples: [{ wordJp: 'あめ', wordCn: '糖果', code: 4 }, { wordJp: '', wordCn: '天安门', code: 4 }, { wordJp: 'あり', wordCn: '蚂蚁', code: 2 }] },
+  { id: 'i', kana: 'い', katakana: 'イ', romaji: 'i', romajiList: ['i'], examples: [{ wordJp: 'いぬ', wordCn: '狗', code: 2 }, { wordJp: 'いしゃ', wordCn: '医生', code: 1 }, { wordJp: 'イギリス', wordCn: '英国', code: 4 }] },
+  { id: 'u', kana: 'う', katakana: 'ウ', romaji: 'u', romajiList: ['u'], examples: [{ wordJp: 'うし', wordCn: '牛', code: 2 }, { wordJp: 'うめ', wordCn: '梅子', code: 4 }, { wordJp: 'うみ', wordCn: '大海', code: 4 }] },
+  { id: 'e', kana: 'え', katakana: 'エ', romaji: 'e', romajiList: ['e'], examples: [{ wordJp: 'えんぴつ', wordCn: '铅笔', code: 4 }, { wordJp: 'エプロン', wordCn: '围裙', code: 4 }, { wordJp: 'えいせい', wordCn: '卫星', code: 4 }] },
+  { id: 'o', kana: 'お', katakana: 'オ', romaji: 'o', romajiList: ['o'], examples: [{ wordJp: 'おにぎり', wordCn: '饭团', code: 3 }, { wordJp: 'おおかみ', wordCn: '狼', code: 2 }, { wordJp: 'おばあさん', wordCn: '老太婆', code: 4 }] },
+
+  // KA行
+  { id: 'ka', kana: 'か', katakana: 'カ', romaji: 'ka', romajiList: ['ka'], examples: [{ wordJp: 'かに', wordCn: '螃蟹', code: 2 }, { wordJp: 'かみ', wordCn: '神仙', code: 1 }, { wordJp: 'かわ', wordCn: '河流', code: 4 }] },
+  { id: 'ki', kana: 'き', katakana: 'キ', romaji: 'ki', romajiList: ['ki'], examples: [{ wordJp: 'きりん', wordCn: '麒麟', code: 2 }, { wordJp: 'き', wordCn: '树', code: 4 }, { wordJp: 'きぞく', wordCn: '贵族', code: 1 }] },
+  { id: 'ku', kana: 'く', katakana: 'ク', romaji: 'ku', romajiList: ['ku'], examples: [{ wordJp: 'くるま', wordCn: '车', code: 4 }, { wordJp: 'くま', wordCn: '熊', code: 2 }, { wordJp: 'くうこう', wordCn: '机场', code: 4 }] },
+  { id: 'ke', kana: 'け', katakana: 'ケ', romaji: 'ke', romajiList: ['ke'], examples: [{ wordJp: 'けいたい', wordCn: '手机', code: 4 }, { wordJp: 'けいさつ', wordCn: '警察', code: 1 }, { wordJp: 'ケーキ', wordCn: '蛋糕', code: 3 }] },
+  { id: 'ko', kana: 'こ', katakana: 'コ', romaji: 'ko', romajiList: ['ko'], examples: [{ wordJp: 'コップ', wordCn: '杯子', code: 4 }, { wordJp: 'こい', wordCn: '鲤鱼', code: 2 }, { wordJp: 'こども', wordCn: '孩子', code: 1 }] },
+
+  // SA行
+  { id: 'sa', kana: 'さ', katakana: 'サ', romaji: 'sa', romajiList: ['sa'], examples: [{ wordJp: 'さる', wordCn: '猴子', code: 2 }, { wordJp: 'さめ', wordCn: '鲨鱼', code: 2 }, { wordJp: 'さくら', wordCn: '樱花', code: 4 }] },
+  { id: 'shi', kana: 'し', katakana: 'シ', romaji: 'shi', romajiList: ['shi', 'si'], examples: [{ wordJp: 'しいたけ', wordCn: '香菇', code: 3 }, { wordJp: 'つりばり', wordCn: '钓钩', code: 4 }, { wordJp: 'しか', wordCn: '鹿', code: 2 }] },
+  { id: 'su', kana: 'す', katakana: 'ス', romaji: 'su', romajiList: ['su'], examples: [{ wordJp: 'すいか', wordCn: '西瓜', code: 3 }, { wordJp: 'す', wordCn: '醋', code: 3 }, { wordJp: 'すっぽん', wordCn: '鳖', code: 2 }] },
+  { id: 'se', kana: 'せ', katakana: 'セ', romaji: 'se', romajiList: ['se'], examples: [{ wordJp: 'せっけん', wordCn: '肥皂', code: 4 }, { wordJp: 'セロリ', wordCn: '芹菜', code: 3 }, { wordJp: 'せんせい', wordCn: '老师', code: 4 }] },
+  { id: 'so', kana: 'そ', katakana: 'ソ', romaji: 'so', romajiList: ['so'], examples: [{ wordJp: 'そうりょ', wordCn: '僧侣', code: 1 }, { wordJp: 'ソフト', wordCn: '软件', code: 4 }, { wordJp: 'ソファ', wordCn: '沙发', code: 4 }] },
+
+  // TA行
+  { id: 'ta', kana: 'た', katakana: 'タ', romaji: 'ta', romajiList: ['ta'], examples: [{ wordJp: 'タクシー', wordCn: '的士', code: 4 }, { wordJp: 'たつ', wordCn: '龙', code: 2 }, { wordJp: 'たいよう', wordCn: '太阳', code: 4 }] },
+  { id: 'chi', kana: 'ち', katakana: 'チ', romaji: 'chi', romajiList: ['chi', 'ti'], examples: [{ wordJp: 'ち', wordCn: '血', code: 3 }, { wordJp: 'ちず', wordCn: '地图', code: 4 }, { wordJp: 'ちからもち', wordCn: '大力士', code: 1 }] },
+  { id: 'tsu', kana: 'つ', katakana: 'ツ', romaji: 'tsu', romajiList: ['tsu', 'tu'], examples: [{ wordJp: 'つえ', wordCn: '拐杖', code: 4 }, { wordJp: 'つめ', wordCn: '爪子', code: 2 }, { wordJp: 'つま', wordCn: '妻子', code: 1 }] },
+  { id: 'te', kana: 'て', katakana: 'テ', romaji: 'te', romajiList: ['te'], examples: [{ wordJp: 'て', wordCn: '手', code: 4 }, { wordJp: 'てっぱん', wordCn: '铁板', code: 4 }, { wordJp: 'てんし', wordCn: '天使', code: 1 }] },
+  { id: 'to', kana: 'と', katakana: 'ト', romaji: 'to', romajiList: ['to'], examples: [{ wordJp: 'とけい', wordCn: '时钟', code: 4 }, { wordJp: 'とら', wordCn: '老虎', code: 2 }, { wordJp: 'とうきょう', wordCn: '东京', code: 4 }] },
+
+  // NA行
+  { id: 'na', kana: 'な', katakana: 'ナ', romaji: 'na', romajiList: ['na'], examples: [{ wordJp: 'なす', wordCn: '茄子', code: 3 }, { wordJp: 'ナイフ', wordCn: '刀', code: 4 }, { wordJp: 'ナイト', wordCn: '骑士', code: 1 }] },
+  { id: 'ni', kana: 'に', katakana: 'ニ', romaji: 'ni', romajiList: ['ni'], examples: [{ wordJp: 'にわとり', wordCn: '鸡', code: 3 }, { wordJp: 'にんぷ', wordCn: '孕妇', code: 1 }, { wordJp: 'にく', wordCn: '肉', code: 3 }] },
+  { id: 'nu', kana: 'ぬ', katakana: 'ヌ', romaji: 'nu', romajiList: ['nu'], examples: [{ wordJp: 'ぬの', wordCn: '布', code: 4 }, { wordJp: 'ヌード', wordCn: '裸体', code: 2 }, { wordJp: 'ぬいぐるみ', wordCn: '布偶', code: 4 }] },
+  { id: 'ne', kana: 'ね', katakana: 'ネ', romaji: 'ne', romajiList: ['ne'], examples: [{ wordJp: 'ねこ', wordCn: '猫', code: 2 }, { wordJp: 'ねぎ', wordCn: '葱', code: 4 }, { wordJp: 'ネクタイ', wordCn: '领带', code: 4 }] },
+  { id: 'no', kana: 'の', katakana: 'ノ', romaji: 'no', romajiList: ['no'], examples: [{ wordJp: 'ノート', wordCn: '笔记本', code: 4 }, { wordJp: 'のみ', wordCn: '跳蚤', code: 2 }, { wordJp: 'ノーベル', wordCn: '诺贝尔', code: 1 }] },
+
+  // HA行
+  { id: 'ha', kana: 'は', katakana: 'ハ', romaji: 'ha', romajiList: ['ha'], examples: [{ wordJp: 'はな', wordCn: '花', code: 4 }, { wordJp: 'はち', wordCn: '蜜蜂', code: 2 }, { wordJp: 'ハワイ', wordCn: '夏威夷', code: 4 }] },
+  { id: 'hi', kana: 'ひ', katakana: 'ヒ', romaji: 'hi', romajiList: ['hi'], examples: [{ wordJp: 'ひつじ', wordCn: '羊', code: 2 }, { wordJp: 'ひまわり', wordCn: '向日葵', code: 4 }, { wordJp: 'ヒマラヤ', wordCn: '喜马拉雅', code: 4 }] },
+  { id: 'fu', kana: 'ふ', katakana: 'フ', romaji: 'fu', romajiList: ['fu', 'hu'], examples: [{ wordJp: 'ふうせん', wordCn: '气球', code: 4 }, { wordJp: 'ふく', wordCn: '衣服', code: 4 }, { wordJp: 'ファン', wordCn: '风扇', code: 4 }] },
+  { id: 'he', kana: 'へ', katakana: 'ヘ', romaji: 'he', romajiList: ['he'], examples: [{ wordJp: 'へび', wordCn: '蛇', code: 2 }, { wordJp: 'ヘリコプター', wordCn: '直升机', code: 4 }, { wordJp: 'へや', wordCn: '房间', code: 4 }] },
+  { id: 'ho', kana: 'ほ', katakana: 'ホ', romaji: 'ho', romajiList: ['ho'], examples: [{ wordJp: 'ほうおう', wordCn: '凤凰', code: 4 }, { wordJp: 'ほし', wordCn: '星星', code: 4 }, { wordJp: 'ホテル', wordCn: '酒店', code: 4 }] },
+
+  // MA行
+  { id: 'ma', kana: 'ま', katakana: 'マ', romaji: 'ma', romajiList: ['ma'], examples: [{ wordJp: 'まんじゅう', wordCn: '馒头', code: 3 }, { wordJp: 'マイク', wordCn: '麦克风', code: 4 }, { wordJp: 'マカオ', wordCn: '澳门', code: 4 }] },
+  { id: 'mi', kana: 'み', katakana: 'ミ', romaji: 'mi', romajiList: ['mi'], examples: [{ wordJp: 'ミルク', wordCn: '牛奶', code: 3 }, { wordJp: 'ミミズ', wordCn: '蚯蚓', code: 2 }, { wordJp: 'みなと', wordCn: '港口', code: 4 }] },
+  { id: 'mu', kana: 'む', katakana: 'ム', romaji: 'mu', romajiList: ['mu'], examples: [{ wordJp: 'むし', wordCn: '虫', code: 2 }, { wordJp: 'むち', wordCn: '鞭子', code: 4 }, { wordJp: 'むじんとう', wordCn: '无人岛', code: 4 }] },
+  { id: 'me', kana: 'め', katakana: 'メ', romaji: 'me', romajiList: ['me'], examples: [{ wordJp: 'メガネ', wordCn: '眼镜', code: 4 }, { wordJp: 'メイド', wordCn: '女仆', code: 1 }, { wordJp: 'めくら', wordCn: '盲人', code: 4 }] },
+  { id: 'mo', kana: 'も', katakana: 'モ', romaji: 'mo', romajiList: ['mo'], examples: [{ wordJp: 'もも', wordCn: '桃子', code: 3 }, { wordJp: 'モニター', wordCn: '显示器', code: 4 }, { wordJp: 'モスクワ', wordCn: '莫斯科', code: 4 }] },
+
+  // YA行
+  { id: 'ya', kana: 'や', katakana: 'ヤ', romaji: 'ya', romajiList: ['ya'], examples: [{ wordJp: 'やかん', wordCn: '水壶', code: 4 }, { wordJp: 'やくざ', wordCn: '黑社会', code: 4 }, { wordJp: 'やま', wordCn: '山', code: 4 }] },
+  { id: 'yu', kana: 'ゆ', katakana: 'ユ', romaji: 'yu', romajiList: ['yu'], examples: [{ wordJp: 'ゆき', wordCn: '雪', code: 3 }, { wordJp: 'ゆかた', wordCn: '浴衣', code: 4 }, { wordJp: 'ゆびわ', wordCn: '戒指', code: 4 }] },
+  { id: 'yo', kana: 'よ', katakana: 'ヨ', romaji: 'yo', romajiList: ['yo'], examples: [{ wordJp: 'ヨーグルト', wordCn: '酸奶', code: 3 }, { wordJp: 'ヨーロッパ', wordCn: '欧洲', code: 4 }, { wordJp: 'よる', wordCn: '夜晚', code: 4 }] },
+
+  // RA行
+  { id: 'ra', kana: 'ら', katakana: 'ラ', romaji: 'ra', romajiList: ['ra'], examples: [{ wordJp: 'ラーメン', wordCn: '拉面', code: 3 }, { wordJp: 'らかん', wordCn: '罗汉', code: 1 }, { wordJp: 'らくだ', wordCn: '骆驼', code: 2 }] },
+  { id: 'ri', kana: 'り', katakana: 'リ', romaji: 'ri', romajiList: ['ri'], examples: [{ wordJp: 'りんご', wordCn: '苹果', code: 3 }, { wordJp: 'リモコン', wordCn: '遥控器', code: 3 }, { wordJp: 'りす', wordCn: '松鼠', code: 2 }] },
+  { id: 'ru', kana: 'る', katakana: 'ル', romaji: 'ru', romajiList: ['ru'], examples: [{ wordJp: 'ルビー', wordCn: '红宝石', code: 4 }, { wordJp: 'るろう', wordCn: '流浪', code: 1 }, { wordJp: 'るり', wordCn: '琉璃', code: 4 }] },
+  { id: 're', kana: 'れ', katakana: 'レ', romaji: 're', romajiList: ['re'], examples: [{ wordJp: 'れいぞうこ', wordCn: '冰箱', code: 4 }, { wordJp: 'レーザー', wordCn: '激光', code: 4 }, { wordJp: 'れっしゃ', wordCn: '列车', code: 4 }] },
+  { id: 'ro', kana: 'ろ', katakana: 'ロ', romaji: 'ro', romajiList: ['ro'], examples: [{ wordJp: 'ロボット', wordCn: '机器人', code: 4 }, { wordJp: 'ろうそく', wordCn: '蜡烛', code: 4 }, { wordJp: 'ロケット', wordCn: '火箭', code: 4 }] },
+
+  // WA行 & 拨音
+  { id: 'wa', kana: 'わ', katakana: 'ワ', romaji: 'wa', romajiList: ['wa'], examples: [{ wordJp: 'わに', wordCn: '鳄鱼', code: 3 }, { wordJp: 'わん', wordCn: '饭碗', code: 4 }, { wordJp: 'わた', wordCn: '棉花', code: 4 }] },
+  { id: 'wo', kana: 'を', katakana: 'ヲ', romaji: 'wo', romajiList: ['wo', 'o'], examples: [{ wordJp: 'ほんをよむ', wordCn: '看书', code: 4 }, { wordJp: 'お茶をのむ', wordCn: '喝茶', code: 3 }, { wordJp: 'てをあらう', wordCn: '洗手', code: 4 }] },
+  { id: 'n', kana: 'ん', katakana: 'ン', romaji: 'n', romajiList: ['n', 'nn'], examples: [{ wordJp: 'いす', wordCn: '椅子', code: 4 }, { wordJp: 'せんしゅ', wordCn: '运动员', code: 1 }, { wordJp: 'ほん', wordCn: '书本', code: 4 }] },
+
+  // GA行 (浊音)
+  { id: 'ga', kana: 'が', katakana: ' ガ', romaji: 'ga', romajiList: ['ga'], examples: [{ wordJp: 'がちょう', wordCn: '鹅', code: 3 }, { wordJp: 'がっき', wordCn: '乐器', code: 4 }, { wordJp: 'がっこう', wordCn: '学校', code: 4 }] },
+  { id: 'gi', kana: 'ぎ', katakana: 'ギ', romaji: 'gi', romajiList: ['gi'], examples: [{ wordJp: 'ぎん', wordCn: '银', code: 4 }, { wordJp: 'ぎし', wordCn: '工程师', code: 4 }, { wordJp: 'ぎゅうにゅう', wordCn: '牛奶', code: 3 }] },
+  { id: 'gu', kana: 'ぐ', katakana: 'グ', romaji: 'gu', romajiList: ['gu'], examples: [{ wordJp: 'グルメ', wordCn: '美食', code: 3 }, { wordJp: 'ぐんたい', wordCn: '军队', code: 4 }, { wordJp: 'ぐんじん', wordCn: '军人', code: 1 }] },
+  { id: 'ge', kana: 'げ', katakana: 'ゲ', romaji: 'ge', romajiList: ['ge'], examples: [{ wordJp: 'げた', wordCn: '木屐', code: 4 }, { wordJp: 'げいじゅつか', wordCn: '艺术家', code: 4 }, { wordJp: 'ゲーム', wordCn: '游戏', code: 4 }] },
+  { id: 'go', kana: 'ご', katakana: 'ゴ', romaji: 'go', romajiList: ['go'], examples: [{ wordJp: 'ごはん', wordCn: '米饭', code: 3 }, { wordJp: 'ゴム', wordCn: '橡胶', code: 4 }, { wordJp: 'ゴルフ', wordCn: '高尔夫', code: 4 }] },
+
+  // ZA行 (浊音)
+  { id: 'za', kana: 'ざ', katakana: 'ザ', romaji: 'za', romajiList: ['za'], examples: [{ wordJp: 'ザーサイ', wordCn: '榨菜', code: 4 }, { wordJp: 'ざいほう', wordCn: '财宝', code: 4 }, { wordJp: 'ざいにん', wordCn: '罪人', code: 2 }] },
+  { id: 'ji', kana: 'じ', katakana: 'ジ', romaji: 'ji', romajiList: ['ji', 'zi'], examples: [{ wordJp: 'ジーンズ', wordCn: '牛仔裤', code: 4 }, { wordJp: 'ジンジャ', wordCn: '神社', code: 4 }, { wordJp: 'ジャーナリスト', wordCn: '记者', code: 2 }] },
+  { id: 'zu', kana: 'ず', katakana: 'ズ', romaji: 'zu', romajiList: ['zu'], examples: [{ wordJp: 'ずかん', wordCn: '图鉴', code: 4 }, { wordJp: 'ずのう', wordCn: '头脑', code: 4 }, { wordJp: 'ずきん', wordCn: '头巾', code: 4 }] },
+  { id: 'ze', kana: 'ぜ', katakana: 'ゼ', romaji: 'ze', romajiList: ['ze'], examples: [{ wordJp: 'ゼリー', wordCn: '果冻', code: 4 }, { wordJp: 'ぜに', wordCn: '铜钱', code: 4 }, { wordJp: 'ぜんこく', wordCn: '全国', code: 4 }] },
+  { id: 'zo', kana: 'ぞ', katakana: 'ゾ', romaji: 'zo', romajiList: ['zo'], examples: [{ wordJp: 'ゾンビ', wordCn: '僵尸', code: 4 }, { wordJp: 'ぞう', wordCn: '大象', code: 2 }, { wordJp: 'ぞうきん', wordCn: '抹布', code: 4 }] },
+
+  // DA行 (浊音)
+  { id: 'da', kana: 'だ', katakana: 'ダ', romaji: 'da', romajiList: ['da'], examples: [{ wordJp: 'ダック', wordCn: '鸭子', code: 2 }, { wordJp: 'だいず', wordCn: '大豆', code: 4 }, { wordJp: 'ダイヤ', wordCn: '钻石', code: 4 }] },
+  { id: 'dji', kana: 'ぢ', katakana: 'ヂ', romaji: 'ji', romajiList: ['ji', 'di', 'dji'], examples: [{ wordJp: 'はなぢ', wordCn: '鼻血', code: 4 }, { wordJp: 'ぢめん', wordCn: '地面', code: 4 }, { wordJp: 'ぢしん', wordCn: '自信', code: 4 }] },
+  { id: 'dzu', kana: 'づ', katakana: 'ヅ', romaji: 'dzu', romajiList: ['dzu', 'du', 'zu'], examples: [{ wordJp: 'もやし', wordCn: '豆芽', code: 4 }, { wordJp: 'づら', wordCn: '面具/假发', code: 4 }, { wordJp: 'つづく', wordCn: '继续', code: 4 }] },
+  { id: 'de', kana: 'で', katakana: 'デ', romaji: 'de', romajiList: ['de'], examples: [{ wordJp: 'でぶ', wordCn: '胖子', code: 1 }, { wordJp: 'デスク', wordCn: '桌子', code: 4 }, { wordJp: 'でんしゃ', wordCn: '电车', code: 4 }] },
+  { id: 'do', kana: 'ど', katakana: 'ド', romaji: 'do', romajiList: ['do'], examples: [{ wordJp: 'ドーナツ', wordCn: '面包圈', code: 4 }, { wordJp: 'どうくつ', wordCn: '洞穴', code: 4 }, { wordJp: 'ドア', wordCn: '门', code: 4 }] },
+
+  // BA行 (浊音)
+  { id: 'ba', kana: 'ば', katakana: 'バ', romaji: 'ba', romajiList: ['ba'], examples: [{ wordJp: 'ばくちく', wordCn: '鞭炮', code: 4 }, { wordJp: 'バス', wordCn: '巴士', code: 4 }, { wordJp: 'バナナ', wordCn: '香蕉', code: 3 }] },
+  { id: 'bi', kana: 'び', katakana: 'ビ', romaji: 'bi', romajiList: ['bi'], examples: [{ wordJp: 'びじん', wordCn: '美女', code: 1 }, { wordJp: 'ビール', wordCn: '啤酒', code: 4 }, { wordJp: 'ビル', wordCn: '大楼', code: 4 }] },
+  { id: 'bu', kana: 'ぶ', katakana: 'ブ', romaji: 'bu', romajiList: ['bu'], examples: [{ wordJp: 'ぶどう', wordCn: '葡萄', code: 3 }, { wordJp: 'ブス', wordCn: '丑女', code: 4 }, { wordJp: 'ぶた', wordCn: '猪', code: 2 }] },
+  { id: 'be', kana: 'べ', katakana: 'ベ', romaji: 'be', romajiList: ['be'], examples: [{ wordJp: 'べいこく', wordCn: '美国', code: 4 }, { wordJp: 'ベンジョ', wordCn: '马桶', code: 4 }, { wordJp: 'ベッド', wordCn: '床', code: 4 }] },
+  { id: 'bo', kana: 'ぼ', katakana: 'ボ', romaji: 'bo', romajiList: ['bo'], examples: [{ wordJp: 'ぼち', wordCn: '墓地', code: 4 }, { wordJp: 'ぼうし', wordCn: '帽子', code: 4 }, { wordJp: 'ボール', wordCn: '球', code: 4 }] },
+
+  // PA行 (半浊音)
+  { id: 'pa', kana: 'ぱ', katakana: 'パ', romaji: 'pa', romajiList: ['pa'], examples: [{ wordJp: 'パン', wordCn: '面包', code: 3 }, { wordJp: 'パンダ', wordCn: '熊猫', code: 2 }, { wordJp: 'パトカー', wordCn: '巡逻警车', code: 4 }] },
+  { id: 'pi', kana: 'ぴ', katakana: 'ピ', romaji: 'pi', romajiList: ['pi'], examples: [{ wordJp: 'ピアノ', wordCn: '钢琴', code: 4 }, { wordJp: 'ピザ', wordCn: '披萨', code: 3 }, { wordJp: 'ピンク', wordCn: '粉红色', code: 4 }] },
+  { id: 'pu', kana: 'ぷ', katakana: 'プ', romaji: 'pu', romajiList: ['pu'], examples: [{ wordJp: 'プリン', wordCn: '布丁', code: 3 }, { wordJp: 'プール', wordCn: '游泳池', code: 4 }, { wordJp: 'プレゼント', wordCn: '礼物', code: 4 }] },
+  { id: 'pe', kana: 'ぺ', katakana: 'ペ', romaji: 'pe', romajiList: ['pe'], examples: [{ wordJp: 'ペン', wordCn: '钢笔', code: 4 }, { wordJp: 'ペンギン', wordCn: '企鹅', code: 2 }, { wordJp: 'ペーパー', wordCn: '纸张', code: 4 }] },
+  { id: 'po', kana: 'ぽ', katakana: 'ポ', romaji: 'po', romajiList: ['po'], examples: [{ wordJp: 'ポスト', wordCn: '邮筒/信箱', code: 4 }, { wordJp: 'ポテト', wordCn: '薯条/土豆', code: 3 }, { wordJp: 'ポケット', wordCn: '口袋', code: 4 }] },
+];
+
+const KNOWN_ROMAJI = [
+  'dzu', 'shi', 'tsu', 'chi',
+  'ka', 'ki', 'ku', 'ke', 'ko',
+  'sa', 'si', 'su', 'se', 'so',
+  'ta', 'ti', 'tu', 'te', 'to',
+  'na', 'ni', 'nu', 'ne', 'no',
+  'ha', 'hi', 'fu', 'hu', 'he', 'ho',
+  'ma', 'mi', 'mu', 'me', 'mo',
+  'ya', 'yu', 'yo',
+  'ra', 'ri', 'ru', 're', 'ro',
+  'wa', 'wo',
+  'ga', 'gi', 'gu', 'ge', 'go',
+  'za', 'ji', 'zi', 'zu', 'ze', 'zo',
+  'da', 'de', 'do',
+  'ba', 'bi', 'bu', 'be', 'bo',
+  'pa', 'pi', 'pu', 'pe', 'po',
+  'nn', 'a', 'i', 'u', 'e', 'o', 'n'
+];
+
+function tokenizeContinuousRomaji(str) {
+  let s = str.trim().toLowerCase();
+  const tokens = [];
+  while (s.length > 0) {
+    let matched = false;
+    for (const r of KNOWN_ROMAJI) {
+      if (s.startsWith(r)) {
+        tokens.push(r);
+        s = s.slice(r.length);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      tokens.push(s.slice(0, 1));
+      s = s.slice(1);
+    }
+  }
+  return tokens;
+}
+
+function parseTokens(rawQuery) {
+  if (!rawQuery) return { tokens: [], isPureKanaQuery: false };
+  const normalized = rawQuery.replace(/[\u3000\s]+/g, ' ').trim().toLowerCase();
+  if (!normalized) return { tokens: [], isPureKanaQuery: false };
+
+  const cleanedKanaOnly = normalized.replace(/[\s,，、/+\|；;]+/g, '');
+  const isPureKanaQuery = /^[\u3040-\u309F\u30A0-\u30FF]+$/.test(cleanedKanaOnly);
+
+  const rawSegments = normalized.split(/[\s,，、/+\|；;]+/g).filter(Boolean);
+  const finalTokens = [];
+
+  for (const seg of rawSegments) {
+    const isPureKana = /^[\u3040-\u309F\u30A0-\u30FF]+$/.test(seg);
+    if (isPureKana) {
+      for (const char of seg) {
+        finalTokens.push(char);
+      }
+      continue;
+    }
+
+    const isPureAlpha = /^[a-z]+$/.test(seg);
+    if (isPureAlpha) {
+      const isSingleSyllable = KNOWN_ROMAJI.some(r => r === seg && r.length === seg.length);
+      if (seg.length > 1 && !isSingleSyllable) {
+        const sub = tokenizeContinuousRomaji(seg);
+        if (sub.length > 1) {
+          finalTokens.push(...sub);
+          continue;
+        }
+      }
+    }
+    finalTokens.push(seg);
+  }
+
+  const validTokens = finalTokens.filter(t => t && t.length > 0);
+  return { tokens: validTokens, isPureKanaQuery };
+}
+
+function playSpeech(text) {
+  if (!text || !('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'ja-JP';
+  utterance.rate = 0.9;
+  window.speechSynthesis.speak(utterance);
+}
+
+function highlight(text, tokens) {
+  if (!text || !tokens || tokens.length === 0) return text || '';
+  const lower = text.toLowerCase();
+  const matched = tokens.find(t => lower.includes(t));
+  if (!matched) return text;
+  const idx = lower.indexOf(matched);
+  if (idx === -1) return text;
+  return text.slice(0, idx) + '<mark>' + text.slice(idx, idx + matched.length) + '</mark>' + text.slice(idx + matched.length);
+}
+
+function renderTable() {
+  const inputEl = document.getElementById('searchInput');
+  const query = inputEl ? inputEl.value : '';
+  const clearBtn = document.getElementById('clearBtn');
+  if (clearBtn) clearBtn.style.display = query ? 'flex' : 'none';
+
+  const { tokens, isPureKanaQuery } = parseTokens(query);
+
+  let filtered = KANA_DATA;
+  if (tokens.length > 0) {
+    const result = [];
+    for (const token of tokens) {
+      const t = token.toLowerCase();
+      const directMatch = KANA_DATA.find(item => 
+        item.kana === t || 
+        item.katakana === t || 
+        item.romaji.toLowerCase() === t || 
+        item.romajiList.some(r => r.toLowerCase() === t)
+      );
+
+      if (directMatch) {
+        result.push(directMatch);
+        continue;
+      }
+
+      if (!isPureKanaQuery) {
+        const wordMatches = KANA_DATA.filter(item => {
+          const matchesEx = item.examples.some(ex => {
+            if (!ex.wordJp && !ex.wordCn) return false;
+            return ex.wordJp.toLowerCase().includes(t) || ex.wordCn.toLowerCase().includes(t);
+          });
+          if (matchesEx) return true;
+          if (item.examples.some(ex => String(ex.code) === t)) return true;
+          return false;
+        });
+
+        for (const wm of wordMatches) {
+          if (!result.includes(wm)) {
+            result.push(wm);
+          }
+        }
+      }
+    }
+    filtered = result;
+  }
+
+  // Update Count & Badges
+  const countEl = document.getElementById('matchCount');
+  if (countEl) countEl.textContent = filtered.length;
+
+  const infoTags = document.getElementById('infoTags');
+  if (infoTags) {
+    infoTags.innerHTML = `<span>显示结果: <strong style="color:#0f172a;">${filtered.length}</strong> / 64 个音图</span>`;
+    if (tokens.length > 0) {
+      infoTags.innerHTML += ` · <span>匹配词: ` + tokens.map(t => `<span class="matched-chip">${t}</span>`).join(' ') + `</span>`;
+    }
+  }
+
+  const tbody = document.getElementById('tableBody');
+  const emptyState = document.getElementById('emptyState');
+  const table = document.getElementById('kanaTable');
+
+  if (filtered.length === 0) {
+    if (tbody) tbody.innerHTML = '';
+    if (emptyState) emptyState.style.display = 'block';
+    if (table) table.style.display = 'none';
+    return;
+  }
+
+  if (emptyState) emptyState.style.display = 'none';
+  if (table) table.style.display = 'table';
+
+  if (tbody) {
+    tbody.innerHTML = filtered.map(row => {
+      const e1 = row.examples[0] || {};
+      const e2 = row.examples[1] || {};
+      const e3 = row.examples[2] || {};
+
+      const renderEx = (ex, isAltBg) => {
+        const bg = isAltBg ? 'background:#fafafa;' : '';
+        const jp = ex.wordJp ? `
+          <td style="${bg}font-weight:600;color:#1e293b;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span>${highlight(ex.wordJp, tokens)}</span>
+              <button type="button" class="sound-btn" onclick="playSpeech('${ex.wordJp}')" title="朗读">🔊</button>
+            </div>
+          </td>` : `<td style="${bg}"><div class="empty-block"></div></td>`;
+
+        const cn = ex.wordCn ? `<td style="${bg}color:#475569;">${highlight(ex.wordCn, tokens)}</td>` : `<td style="${bg}"><div class="empty-block"></div></td>`;
+
+        const code = ex.code ? `<td style="${bg}text-align:center;"><span class="code-badge code-${ex.code}">${ex.code}</span></td>` : `<td style="${bg}text-align:center;">-</td>`;
+
+        return jp + cn + code;
+      };
+
+      return `
+        <tr>
+          <td class="kana-cell">
+            <div class="kana-main">
+              <span>${highlight(row.kana, tokens)}</span>
+              <button type="button" class="sound-btn" onclick="playSpeech('${row.kana}')" title="朗读发音">🔊</button>
+            </div>
+            <div class="kana-romaji">${highlight(row.romaji, tokens)}</div>
+          </td>
+          ${renderEx(e1, false)}
+          ${renderEx(e2, true)}
+          ${renderEx(e3, false)}
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+function setQuery(q) {
+  const input = document.getElementById('searchInput');
+  if (input) {
+    input.value = q;
+    renderTable();
+    input.focus();
+  }
+}
+
+const inputEl = document.getElementById('searchInput');
+if (inputEl) {
+  inputEl.addEventListener('input', renderTable);
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      renderTable();
+    }
+  });
+}
+
+const clearBtnEl = document.getElementById('clearBtn');
+if (clearBtnEl) {
+  clearBtnEl.addEventListener('click', () => {
+    setQuery('');
+  });
+}
+
+// Initial Render
+renderTable();
+</script>
+</body>
+</html>
